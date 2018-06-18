@@ -1,6 +1,5 @@
 package brunner.jens.main;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import brunner.jens.utils.Constants;
@@ -11,6 +10,7 @@ public class Planet
 	public Vector2 position;
 	public int mass;
 	public Vector2 vel, force;
+	public boolean delete;
 	
 	public Planet(int x, int y, int mass) 
 	{
@@ -18,14 +18,16 @@ public class Planet
 		this.mass = mass;
 		vel = Constants.ZERO_VECTOR;
 		force = Constants.ZERO_VECTOR;
+		delete = false;
 	}
 	
 	public Planet() //We also want a constructor to make random planets.
 	{
 		this.position = new Vector2(ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.width),
 									ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.height));
-		mass = ThreadLocalRandom.current().nextInt(1,50);
+		mass = ThreadLocalRandom.current().nextInt(5,200);
 		vel = Constants.ZERO_VECTOR;
 		force = Constants.ZERO_VECTOR;
+		delete = false;
 	}	
 }

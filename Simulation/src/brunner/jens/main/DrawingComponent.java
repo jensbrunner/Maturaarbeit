@@ -9,6 +9,8 @@ import javax.swing.JComponent;
 
 public class DrawingComponent extends JComponent
 {
+	private static final long serialVersionUID = 1L;
+
 	@Override 
 	public void paintComponent(Graphics g)
 	{
@@ -19,7 +21,8 @@ public class DrawingComponent extends JComponent
 		g2.setColor(Color.DARK_GRAY);
 		for(Planet planet : PlanetHandler.planets)
 		{
-			g2.fill(new Ellipse2D.Float(planet.position.x-planet.mass/2, planet.position.y-planet.mass/2, planet.mass, planet.mass));
+			float diameter = (float) (2.0f*Math.sqrt(planet.mass));
+			g2.fill(new Ellipse2D.Float(planet.position.x-diameter/2, planet.position.y-diameter/2, diameter, diameter));
 			//g2.drawLine((int)planet.position.x, (int)planet.position.y, (int)planet.position.x + (int)planet.vel.x, (int)planet.position.y + (int)planet.vel.y);
 		}
 	}

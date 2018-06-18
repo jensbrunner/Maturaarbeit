@@ -1,8 +1,6 @@
 package brunner.jens.main;
 
 import brunner.jens.utils.Constants;
-import brunner.jens.utils.Vector2;
-import brunner.jens.utils.Vector2Math;
 
 public class Main
 {
@@ -10,26 +8,32 @@ public class Main
 	public static void main(String[] args)
 	{
 		SimulationWindow simWind = new SimulationWindow();
-		PlanetHandler.createRandomPlanets(10);
+		PlanetHandler.createRandomPlanets(300);
 		
-		while(true) {
-			long start = System.currentTimeMillis();
-			PlanetHandler.updatePlanets();
-			simWind.repaint();
-			
-			if(System.currentTimeMillis()-start < Constants.MS_PER_FRAME)
+		long currentTime = System.currentTimeMillis();
+		
+		while(true) //In the main loop we use the concept of a variable timestep. Taken from https://gafferongames.com/post/fix_your_timestep/ on 18.06.2018.
+		{
+			if(System.currentTimeMillis()-currentTime < 1)
 			{	
-				try 
+				try
 				{
-					Thread.sleep(start + Constants.MS_PER_FRAME - System.currentTimeMillis());
+					Thread.sleep(1);
 				} catch (InterruptedException e) 
 				{
 					System.out.println("Loop was unable to sleep. Exiting...");
 					System.exit(0);
 				}
 			}
-			System.out.println(System.currentTimeMillis()-start);
+			long newTime = System.currentTimeMillis();
+			long frameTime = newTime-currentTime;
+			currentTime = newTime;
+			
+			//System.out.println(frameTime);
+			System.out.println(PlanetHandler.planets.size());
+			PlanetHandler.updatePlanets(frameTime);
+			
+			simWind.repaint();
 		}
 	}
 }
-w

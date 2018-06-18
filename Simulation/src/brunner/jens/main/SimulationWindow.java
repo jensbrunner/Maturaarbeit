@@ -1,16 +1,13 @@
 package brunner.jens.main;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
 import javax.swing.JFrame;
 
 import brunner.jens.utils.Constants;
 
 public class SimulationWindow extends JFrame 
 {
-	
+	private static final long serialVersionUID = 1L;
+
 	public SimulationWindow()
 	{
 		super("n-Body Simulation");
