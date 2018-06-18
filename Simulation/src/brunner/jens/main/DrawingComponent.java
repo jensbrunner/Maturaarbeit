@@ -23,7 +23,6 @@ public class DrawingComponent extends JComponent
 		{
 			float diameter = (float) (2.0f*Math.sqrt(planet.mass));
 			g2.fill(new Ellipse2D.Float(planet.position.x-diameter/2, planet.position.y-diameter/2, diameter, diameter));
-			//g2.drawLine((int)planet.position.x, (int)planet.position.y, (int)planet.position.x + (int)planet.vel.x, (int)planet.position.y + (int)planet.vel.y);
 		}
 	}
 }
