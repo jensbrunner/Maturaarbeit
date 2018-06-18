@@ -1,7 +1,5 @@
 package brunner.jens.main;
 
-import brunner.jens.utils.Constants;
-
 public class Main
 {
 
