@@ -1,5 +1,8 @@
 package brunner.jens.main;
 
+import java.awt.Color;
+import java.awt.Container;
+
 import javax.swing.JFrame;
 
 import brunner.jens.utils.Constants;
@@ -17,5 +20,7 @@ public class SimulationWindow extends JFrame
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		add(new DrawingComponent());
+		Container c = this.getContentPane();
+		c.setBackground(Color.BLACK);
 	}
 }

@@ -1,6 +1,7 @@
 package brunner.jens.main;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import brunner.jens.utils.Constants;
 import brunner.jens.utils.Vector2;
@@ -8,11 +9,11 @@ import brunner.jens.utils.Vector2Math;
 
 public class PlanetHandler 
 {
-	public static ArrayList<Planet> planets = new ArrayList<Planet>(); 
+	public static CopyOnWriteArrayList<Planet> planets = new CopyOnWriteArrayList<Planet>(); 
 	
 	public static void createRandomPlanets(int amount)
 	{
-		for(int i = 0; i <= amount; i++)
+		for(int i = 0; i < amount; i++)
 		{
 			planets.add(new Planet());
 		}
@@ -29,9 +30,7 @@ public class PlanetHandler
 			
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
 			handleCollision(planet);
-			
-			//System.out.println(frameTime/1000.0f);
-			
+						
 			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
 			
@@ -60,7 +59,7 @@ public class PlanetHandler
 		for(Planet otherPlanet : planets)
 		{
 			//Also here, if we are deleting the planet, don't interact with it.
-			if(otherPlanet != planet && !otherPlanet.delete)
+			if(otherPlanet != planet && !otherPlanet.delete && (planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y))
 			{
 				//First we get the x,y and magnitudal distance between the two bodies.
 				int xDist = (int) (otherPlanet.position.x - planet.position.x);
@@ -86,7 +85,8 @@ public class PlanetHandler
 		{
 			//We need to make sure we don't collide with oneself and don't collide with planets marked for delete (already collided with)
 			float diameter = (float) (2.0f*Math.sqrt(otherPlanet.mass));
-			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < diameter/2) 
+			//if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < diameter/2) 
+			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < 5) 
 			{
 				//Collision detected. Now we compute post-collision forces. We want to absorb the smaller into the heavier planet, otherwise it looks really wonky.
 				if(planet.mass == otherPlanet.mass)

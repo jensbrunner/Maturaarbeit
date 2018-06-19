@@ -25,7 +25,7 @@ public class Planet
 	{
 		this.position = new Vector2(ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.width),
 									ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.height));
-		mass = ThreadLocalRandom.current().nextInt(5,200);
+		mass = ThreadLocalRandom.current().nextInt(5,1000);
 		vel = Constants.ZERO_VECTOR;
 		force = Constants.ZERO_VECTOR;
 		delete = false;

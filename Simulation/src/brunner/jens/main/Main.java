@@ -6,7 +6,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		SimulationWindow simWind = new SimulationWindow();
-		PlanetHandler.createRandomPlanets(300);
+		PlanetHandler.createRandomPlanets(1000);
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -17,7 +17,7 @@ public class Main
 				try
 				{
 					Thread.sleep(1);
-				} catch (InterruptedException e) 
+				} catch (InterruptedException e)
 				{
 					System.out.println("Loop was unable to sleep. Exiting...");
 					System.exit(0);
@@ -28,7 +28,7 @@ public class Main
 			currentTime = newTime;
 			
 			//System.out.println(frameTime);
-			System.out.println(PlanetHandler.planets.size());
+			
 			PlanetHandler.updatePlanets(frameTime);
 			
 			simWind.repaint();
