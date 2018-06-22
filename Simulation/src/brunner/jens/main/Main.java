@@ -3,14 +3,16 @@ package brunner.jens.main;
 public class Main
 {
 
+	public static boolean close = false;
+	
 	public static void main(String[] args)
 	{
 		SimulationWindow simWind = new SimulationWindow();
-		PlanetHandler.createRandomPlanets(1000);
+		PlanetHandler.createRandomPlanets(1300);
 		
 		long currentTime = System.currentTimeMillis();
 		
-		while(true) //In the main loop we use the concept of a variable timestep. Taken from https://gafferongames.com/post/fix_your_timestep/ on 18.06.2018.
+		while(!close) //In the main loop we use the concept of a variable timestep. Taken from https://gafferongames.com/post/fix_your_timestep/ on 18.06.2018.
 		{
 			if(System.currentTimeMillis()-currentTime < 1)
 			{	
@@ -27,11 +29,10 @@ public class Main
 			long frameTime = newTime-currentTime;
 			currentTime = newTime;
 			
-			//System.out.println(frameTime);
-			
 			PlanetHandler.updatePlanets(frameTime);
 			
 			simWind.repaint();
 		}
+		System.exit(0);
 	}
 }

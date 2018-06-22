@@ -12,7 +12,7 @@ public class Planet
 	public Vector2 vel, force;
 	public boolean delete;
 	
-	public Planet(int x, int y, int mass) 
+	public Planet(float x, float y, int mass) 
 	{
 		this.position = new Vector2(x,y);
 		this.mass = mass;
@@ -25,9 +25,9 @@ public class Planet
 	{
 		this.position = new Vector2(ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.width),
 									ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.height));
-		mass = ThreadLocalRandom.current().nextInt(5,1000);
+		mass = 10; //ThreadLocalRandom.current().nextInt(5,100);
 		vel = Constants.ZERO_VECTOR;
 		force = Constants.ZERO_VECTOR;
 		delete = false;
-	}	
+	}
 }

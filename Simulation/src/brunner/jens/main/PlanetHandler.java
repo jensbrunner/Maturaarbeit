@@ -21,15 +21,18 @@ public class PlanetHandler
 	
 	public static void updatePlanets(long frameTime)
 	{
-		for(Planet planet : planets)
+		//We use a counting iterator because it's easier to solve the problem where we calculate the force per pair twice instead of just once necessary. 
+		for(int i = 0; i < planets.size(); i++)
 		{
+			Planet planet = planets.get(i);
+			
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
 			
-			computeAndSetPullForce(planet);
+			computeAndSetPullForce(planet, i);
 			
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
-			handleCollision(planet);
+			//handleCollision(planet);
 						
 			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
@@ -41,12 +44,14 @@ public class PlanetHandler
 			//it to the velocity. Otherwise we would be constantly increasing the amount
 			//of force per execution.
 			planet.force = Constants.ZERO_VECTOR;
-			
-			//Finally, we update the positions. Note that even here, we have to account for
-			//the time that is passing as s=v*t
+		}
+		
+		//Finally, we update the positions. Note that even here, we have to account for the time that is passing as s=v*t.
+		for(Planet planet : planets) {
 			Vector2 dDistVec= new Vector2((frameTime/1000.0f)*(planet.vel.x), (frameTime/1000.0f)*(planet.vel.y));
 			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(dDistVec, 1));
 		}
+		
 		ArrayList<Planet> toRemove = new ArrayList<Planet>();
 		for(Planet planet : planets) {
 			if(planet.delete) toRemove.add(planet);
@@ -54,20 +59,25 @@ public class PlanetHandler
 		planets.removeAll(toRemove);
 	}
 	
-	private static void computeAndSetPullForce(Planet planet)
+	private static void computeAndSetPullForce(Planet planet, int i)
 	{
-		for(Planet otherPlanet : planets)
+		for(int j = i+1; j < planets.size(); j++)
 		{
+			Planet otherPlanet = planets.get(j);
+			
 			//Also here, if we are deleting the planet, don't interact with it.
-			if(otherPlanet != planet && !otherPlanet.delete && (planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y))
+			if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
 			{
 				//First we get the x,y and magnitudal distance between the two bodies.
-				int xDist = (int) (otherPlanet.position.x - planet.position.x);
-				int yDist = (int) (otherPlanet.position.y - planet.position.y);
-				float dist = Vector2Math.distance(planet.position, otherPlanet.position);
+				float xDist = (otherPlanet.position.x - planet.position.x);
+				float yDist = (otherPlanet.position.y - planet.position.y);
+				float dist = (float) Math.sqrt(xDist*xDist+yDist*yDist);
+				
+				//This is a virtual limit for how close the bodies can get. It doesn't actually limit the proximity to another body on screen.
+				if(dist < 3f) dist = 3f;
 				
 				//Now we compute first the total and then the component forces
-				//Depending on choice, use r or r^2
+				//Depending on choice, use r or r^2 - this will be TODO later
 				float force = Constants.GRAVITATIONAL_CONSTANT * ((planet.mass*otherPlanet.mass)/(dist*dist)); 
 				float forceX = force * xDist/dist;
 				float forceY = force * yDist/dist;
@@ -75,6 +85,7 @@ public class PlanetHandler
 				//Given the component forces, we construct the force vector and apply it to the body.
 				Vector2 forceVec = new Vector2(forceX, forceY);
 				planet.force = Vector2Math.add(planet.force, forceVec);
+				otherPlanet.force = Vector2Math.subtract(otherPlanet.force, forceVec);
 			}
 		}
 	}
@@ -86,7 +97,7 @@ public class PlanetHandler
 			//We need to make sure we don't collide with oneself and don't collide with planets marked for delete (already collided with)
 			float diameter = (float) (2.0f*Math.sqrt(otherPlanet.mass));
 			//if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < diameter/2) 
-			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < 5) 
+			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < 2f) 
 			{
 				//Collision detected. Now we compute post-collision forces. We want to absorb the smaller into the heavier planet, otherwise it looks really wonky.
 				if(planet.mass == otherPlanet.mass)
@@ -111,5 +122,4 @@ public class PlanetHandler
 			}
 		}
 	}
-	
 }
