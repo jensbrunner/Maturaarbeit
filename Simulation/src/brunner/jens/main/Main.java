@@ -3,12 +3,13 @@ package brunner.jens.main;
 public class Main
 {
 
-	public static boolean close = false;
+	public static boolean close, reset = false;
+	public static int planetAmount = 500;
 	
 	public static void main(String[] args)
 	{
 		SimulationWindow simWind = new SimulationWindow();
-		PlanetHandler.createRandomPlanets(1300);
+		PlanetHandler.createRandomPlanets(planetAmount);
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -28,6 +29,13 @@ public class Main
 			long newTime = System.currentTimeMillis();
 			long frameTime = newTime-currentTime;
 			currentTime = newTime;
+			
+			if(reset)
+			{
+				PlanetHandler.planets.clear();
+				PlanetHandler.createRandomPlanets(planetAmount);
+				reset = false;
+			}
 			
 			PlanetHandler.updatePlanets(frameTime);
 			
