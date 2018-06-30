@@ -8,6 +8,9 @@ import java.awt.geom.Ellipse2D;
 
 import javax.swing.JComponent;
 
+import brunner.jens.utils.Vector2;
+import brunner.jens.utils.Vector2Math;
+
 public class DrawingComponent extends JComponent
 {
 	private static final long serialVersionUID = 1L;
@@ -26,8 +29,13 @@ public class DrawingComponent extends JComponent
 		g2.setColor(Color.WHITE);
 		for(Planet planet : PlanetHandler.planets)
 		{
-			float diameter = (float) (2.0f*Math.sqrt(planet.mass));
-			g2.fill(new Ellipse2D.Float(planet.position.x-2, planet.position.y-2, 4, 4));
+			g2.fillOval((int)planet.position.x-2, (int)planet.position.y-2, 4, 4);
+			
+			if(Main.showVelocityArrows)
+			{
+			//To draw the velocity vectors, we create a line.
+			g2.drawLine((int)planet.position.x, (int)planet.position.y, (int)(planet.position.x+planet.vel.x/6), (int)(planet.position.y+planet.vel.y/6));
+			}
 		}
 	}
 }

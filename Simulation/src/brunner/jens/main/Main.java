@@ -3,13 +3,17 @@ package brunner.jens.main;
 public class Main
 {
 
-	public static boolean close, reset = false;
+	public static boolean close, reset, showVelocityArrows = false;
 	public static int planetAmount = 500;
+	
+	//This is controlled by the "blackHoleCheck" CheckBox in the GUI (see SimulationWindow.java)
+	public static Planet centerBlackHole = null;
 	
 	public static void main(String[] args)
 	{
 		SimulationWindow simWind = new SimulationWindow();
 		PlanetHandler.createRandomPlanets(planetAmount);
+		if(centerBlackHole != null) PlanetHandler.planets.add(centerBlackHole);
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -34,6 +38,7 @@ public class Main
 			{
 				PlanetHandler.planets.clear();
 				PlanetHandler.createRandomPlanets(planetAmount);
+				if(centerBlackHole != null) PlanetHandler.planets.add(centerBlackHole);
 				reset = false;
 			}
 			
