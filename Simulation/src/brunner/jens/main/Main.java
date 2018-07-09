@@ -4,7 +4,8 @@ public class Main
 {
 
 	public static boolean close, reset, showVelocityArrows = false;
-	public static int planetAmount = 500;
+	public static boolean quadTree = true;
+	public static int planetAmount = 200;
 	
 	//This is controlled by the "blackHoleCheck" CheckBox in the GUI (see SimulationWindow.java)
 	public static Planet centerBlackHole = null;
@@ -38,7 +39,12 @@ public class Main
 			{
 				PlanetHandler.planets.clear();
 				PlanetHandler.createRandomPlanets(planetAmount);
-				if(centerBlackHole != null) PlanetHandler.planets.add(centerBlackHole);
+				if(centerBlackHole != null)
+				{
+					PlanetHandler.planets.remove(centerBlackHole);
+					centerBlackHole = new Planet(1920/2f, 1080/2f, 0f, 0f, 10000);
+					PlanetHandler.planets.add(centerBlackHole);
+				}
 				reset = false;
 			}
 			

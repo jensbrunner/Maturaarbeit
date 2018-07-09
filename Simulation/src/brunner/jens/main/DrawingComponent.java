@@ -36,6 +36,18 @@ public class DrawingComponent extends JComponent
 			//To draw the velocity vectors, we create a line.
 			g2.drawLine((int)planet.position.x, (int)planet.position.y, (int)(planet.position.x+planet.vel.x/6), (int)(planet.position.y+planet.vel.y/6));
 			}
+			
+			//Paint the Quadtree
+			paintTree(BarnesHut.node, g2);
 		}
+	}
+	
+	public void paintTree(Quadtree tree, Graphics2D g)
+	{
+		g.drawRect(tree.x, tree.y, tree.sideLength, tree.sideLength);
+		if(tree.getNE() != null) paintTree(tree.getNE(), g);
+		if(tree.getNW() != null) paintTree(tree.getNW(), g);
+		if(tree.getSE() != null) paintTree(tree.getSE(), g);
+		if(tree.getSW() != null) paintTree(tree.getSW(), g);
 	}
 }

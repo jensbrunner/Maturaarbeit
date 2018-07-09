@@ -40,6 +40,7 @@ public class SimulationWindow extends JFrame
 		JTextField planetAmount = new JTextField();
 		JCheckBox blackHoleCheck = new JCheckBox();
 		JCheckBox showVelocityCheck = new JCheckBox();
+		JCheckBox quadTreeCheck = new JCheckBox();
 		
 		closeButton.setBounds(1920-70, 0, 70, 20);
 		closeButton.setText("Close");
@@ -150,6 +151,25 @@ public class SimulationWindow extends JFrame
 				}
 			}
 		});
+		
+		quadTreeCheck.setText("Display Quadtree");
+		quadTreeCheck.setSelected(true);
+		quadTreeCheck.setBounds(1920-130, 1080-20-20-20, 130, 20);
+		quadTreeCheck.addActionListener(new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				if(showVelocityCheck.isSelected())
+				{
+					Main.quadTree = true;
+				}else
+				{
+					Main.quadTree = false;
+				}
+			}
+		});
 
 		DrawingComponent draw = new DrawingComponent();
 		draw.add(closeButton);
@@ -158,6 +178,7 @@ public class SimulationWindow extends JFrame
 		draw.add(planetAmount);
 		draw.add(blackHoleCheck);
 		draw.add(showVelocityCheck);
+		draw.add(quadTreeCheck);
 		add(draw);
 		setVisible(true);
 	}

@@ -21,6 +21,8 @@ public class PlanetHandler
 
 	public static void updatePlanets(long frameTime)
 	{
+		BarnesHut.insertBodies();
+		
 		//We use a counting iterator because it's easier to solve the problem where we calculate the force per pair twice instead of just once necessary. 
 		for(int i = 0; i < planets.size(); i++)
 		{
@@ -74,7 +76,7 @@ public class PlanetHandler
 
 
 				//This is a virtual limit for how close the bodies can get. It doesn't actually limit the proximity to another body on screen.
-				if(dist < 3f) dist = 3f;
+				if(dist < 4f) dist = 4f;
 
 				//Now we compute first the total and then the component forces
 				//Depending on choice, use r or r^2 - this will be TODO later
