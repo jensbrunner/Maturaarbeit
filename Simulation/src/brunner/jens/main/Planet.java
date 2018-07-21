@@ -8,11 +8,11 @@ import brunner.jens.utils.Vector2;
 public class Planet 
 {
 	public Vector2 position;
-	public int mass;
+	public float mass;
 	public Vector2 vel, force;
 	public boolean delete;
 	
-	public Planet(float x, float y, float xVel, float yVel, int mass) 
+	public Planet(float x, float y, float xVel, float yVel, float mass) 
 	{
 		this.position = new Vector2(x,y);
 		this.mass = mass;

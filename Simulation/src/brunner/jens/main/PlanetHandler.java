@@ -31,31 +31,33 @@ public class PlanetHandler
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
 
-			computeForce(planet, i);
+			//computeForce(planet, i);
+			
+			BarnesHut.doPhysics(planet, BarnesHut.root);
 
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
-			//handleCollision(planet);
+			if(Main.collisions) handleCollision(planet);
 
 			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
 
 			//However dv=a*dt
-			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime/1000.0f));
+			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime/1000.0f * Main.timeScale));
 
-			//Now we have to reset the force to 0 after computing the accel and adding
-			//it to the velocity. Otherwise we would be constantly increasing the amount
-			//of force per execution.
+			//net force PER FRAME, so reset it.
 			planet.force = Constants.ZERO_VECTOR;
 		}
 
 		//Finally, we update the positions. Note that even here, we have to account for the time that is passing as s=v*t.
-		for(Planet planet : planets) {
-			Vector2 dDistVec= new Vector2((frameTime/1000.0f)*(planet.vel.x), (frameTime/1000.0f)*(planet.vel.y));
+		for(Planet planet : planets)
+		{
+			Vector2 dDistVec= new Vector2(Main.timeScale*(frameTime/1000.0f)*(planet.vel.x), Main.timeScale*(frameTime/1000.0f)*(planet.vel.y));
 			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(dDistVec, 1));
 		}
 
 		ArrayList<Planet> toRemove = new ArrayList<Planet>();
-		for(Planet planet : planets) {
+		for(Planet planet : planets)
+		{
 			if(planet.delete) toRemove.add(planet);
 		}
 		planets.removeAll(toRemove);
@@ -76,7 +78,7 @@ public class PlanetHandler
 
 
 				//This is a virtual limit for how close the bodies can get. It doesn't actually limit the proximity to another body on screen.
-				if(dist < 4f) dist = 4f;
+				if(dist < 1f) dist = 1f;
 
 				//Now we compute first the total and then the component forces
 				//Depending on choice, use r or r^2 - this will be TODO later
@@ -85,6 +87,21 @@ public class PlanetHandler
 				planet.force = Vector2Math.add(planet.force, forceVector);
 				otherPlanet.force = Vector2Math.subtract(otherPlanet.force, forceVector);
 			}
+		}
+	}
+	
+	public static void computeForceP2P(Planet planet, Planet otherPlanet)
+	{
+		if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
+		{
+			Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
+			float dist = Vector2Math.magnitude(distanceVector);
+
+			if(dist < 1f) dist = 1f;
+
+			Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+
+			planet.force = Vector2Math.add(planet.force, forceVector);
 		}
 	}
 
@@ -139,4 +156,6 @@ public class PlanetHandler
 
 		orbiter.vel = newVelocityVector;
 	}
+
+	
 }

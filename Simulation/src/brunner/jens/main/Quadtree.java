@@ -18,19 +18,19 @@ public class Quadtree
 		sideLength = _sideLength;
 	}
 
-	private Quadtree ne = null;
-	private Quadtree nw = null;
-	private Quadtree se = null;
-	private Quadtree sw = null;
+	public Quadtree ne = null;
+	public Quadtree nw = null;
+	public Quadtree se = null;
+	public Quadtree sw = null;
 
-	private CopyOnWriteArrayList<Planet> bodies = new CopyOnWriteArrayList<>();
+	public CopyOnWriteArrayList<Planet> bodies = new CopyOnWriteArrayList<>();
 
-	private float totalMass;
-	private Vector2 centerOfMass;
+	public float totalMass;
+	public Vector2 centerOfMass;
 
 	public boolean containsBody(Planet p) {
 		if(p.position.x > x && p.position.x < x + sideLength &&
-				p.position.y > y && p.position.y < y + sideLength) return true;
+		   p.position.y > y && p.position.y < y + sideLength) return true;
 		return false;
 	}
 
@@ -41,22 +41,10 @@ public class Quadtree
 		{
 			bodies.add(p);
 			
-			if(ne.containsBody(p))
-			{
-				ne.putBody(p);
-			}
-			if(nw.containsBody(p))
-			{
-				nw.putBody(p);
-			}
-			if(se.containsBody(p))
-			{
-				se.putBody(p);
-			}
-			if(sw.containsBody(p))
-			{
-				sw.putBody(p);
-			}
+			if(ne.containsBody(p)) ne.putBody(p);
+			if(nw.containsBody(p)) nw.putBody(p);
+			if(se.containsBody(p)) se.putBody(p);
+			if(sw.containsBody(p)) sw.putBody(p);
 
 			//Update the total mass and COM
 			totalMass += p.mass;
@@ -69,10 +57,12 @@ public class Quadtree
 				y += _p.position.y * _p.mass;
 			}
 			centerOfMass = new Vector2(x/totalMass, y/totalMass);
+		
 		}else if(bodies.size() == 0)
 		{
 			bodies.add(p);
 			totalMass += p.mass;
+		
 		}else if(bodies.size() == 1)
 		{
 			ne = new Quadtree(x + sideLength/2, y, sideLength/2);
@@ -112,25 +102,5 @@ public class Quadtree
 			}
 			centerOfMass = new Vector2(x/totalMass, y/totalMass);
 		}
-	}
-
-	public Quadtree getNE()
-	{
-		return ne;
-	}
-
-	public Quadtree getNW()
-	{
-		return nw;
-	}
-
-	public Quadtree getSE()
-	{
-		return se;
-	}
-
-	public Quadtree getSW()
-	{
-		return sw;
 	}
 }
