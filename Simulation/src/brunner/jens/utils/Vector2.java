@@ -3,9 +3,9 @@ package brunner.jens.utils;
 public class Vector2
 {
 	
-	public float x,y;
+	public double x,y;
 	
-	public Vector2(float x, float y)
+	public Vector2(double x, double y)
 	{
 		this.x = x;
 		this.y = y;

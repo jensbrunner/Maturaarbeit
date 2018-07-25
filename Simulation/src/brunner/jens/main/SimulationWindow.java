@@ -1,8 +1,6 @@
 package brunner.jens.main;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Scrollbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,21 +11,16 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 
-import brunner.jens.utils.Constants;
 import brunner.jens.utils.FloatSlider;
-import brunner.jens.utils.Vector2;
-import brunner.jens.utils.Vector2Math;
 
 public class SimulationWindow extends JFrame 
 {
 	private static final long serialVersionUID = 1L;
 
+	public static JLabel timePassed = new JLabel();
+	
 	public SimulationWindow()
 	{
 		super("n-Body Simulation");
@@ -135,7 +128,7 @@ public class SimulationWindow extends JFrame
 
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {
-				Main.scaleFactor = (float)zoom.getFloatValue();
+				Main.scaleFactor = zoom.getFloatValue();
 				double rounded = Math.floor(10000 * (double)Main.scaleFactor + 0.5) / 10000;
 				zoomLabel.setText(rounded + "x");
 				System.out.println("Change zoom to: " + Main.scaleFactor + "x");
@@ -152,7 +145,7 @@ public class SimulationWindow extends JFrame
 
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {
-				Main.timeScale = (float)time.getFloatValue();
+				Main.timeScale = time.getFloatValue();
 				double rounded = Math.floor(10000 * (double)Main.timeScale + 0.5) / 10000;
 				timeLabel.setText(rounded + "x");
 				System.out.println("Change time to: " + Main.timeScale + "x");
@@ -237,6 +230,11 @@ public class SimulationWindow extends JFrame
 				}
 			}
 		});
+		
+		timePassed.setText(Main.timeCounter + " sec");
+		timePassed.setForeground(Color.WHITE);
+		timePassed.setFocusable(false);
+		timePassed.setBounds(10, 0, 100, 50);
 
 		DrawingComponent draw = new DrawingComponent();
 		draw.add(closeButton);
@@ -251,6 +249,7 @@ public class SimulationWindow extends JFrame
 		draw.add(showVelocityCheck);
 		draw.add(quadTreeCheck);
 		draw.add(collisionCheck);
+		draw.add(timePassed);
 		add(draw);
 		setVisible(true);
 	}

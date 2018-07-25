@@ -25,7 +25,7 @@ public class Quadtree
 
 	public CopyOnWriteArrayList<Planet> bodies = new CopyOnWriteArrayList<>();
 
-	public float totalMass;
+	public double totalMass;
 	public Vector2 centerOfMass;
 
 	public boolean containsBody(Planet p) {
@@ -49,8 +49,8 @@ public class Quadtree
 			//Update the total mass and COM
 			totalMass += p.mass;
 
-			float x = 0f;
-			float y = 0f;
+			double x = 0f;
+			double y = 0f;
 			for(Planet _p : bodies)
 			{
 				x += _p.position.x * _p.mass;
@@ -93,8 +93,8 @@ public class Quadtree
 			}
 			totalMass += p.mass;
 
-			float x = 0f;
-			float y = 0f;
+			double x = 0f;
+			double y = 0f;
 			for(Planet _p : bodies)
 			{
 				x += _p.position.x * _p.mass;

@@ -31,10 +31,10 @@ public class PlanetHandler
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
 			
-			//We don't want the center to move.
-			if(planet == Main.centerBlackHole) continue;
+			//Don't affect fixed planets.
+			if(planet.fixed) continue;
 
-			//computeForce(planet, i);
+			//computeForce(planet, i, frameTime);
 			
 			BarnesHut.doPhysics(planet, BarnesHut.root);
 
@@ -45,7 +45,7 @@ public class PlanetHandler
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
 			
 			//However dv=a*dt
-			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime/1000.0f * Main.timeScale));
+			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime * Main.timeScale));
 
 			//net force PER FRAME, so reset it.
 			planet.force = Constants.ZERO_VECTOR;
@@ -54,8 +54,8 @@ public class PlanetHandler
 		//Finally, we update the positions. Note that even here, we have to account for the time that is passing as s=v*t.
 		for(Planet planet : planets)
 		{
-			Vector2 dDistVec= new Vector2(Main.timeScale*(frameTime/1000.0f)*(planet.vel.x), Main.timeScale*(frameTime/1000.0f)*(planet.vel.y));
-			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(dDistVec, 1));
+			Vector2 dDistVec = new Vector2(Main.timeScale*(frameTime)*(planet.vel.x), Main.timeScale*(frameTime)*(planet.vel.y));
+			planet.position = Vector2Math.add(planet.position, dDistVec);
 		}
 
 		ArrayList<Planet> toRemove = new ArrayList<Planet>();
@@ -77,7 +77,7 @@ public class PlanetHandler
 			{
 				//First we get the x,y and magnitudal distance between the two bodies.
 				Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
-				float dist = Vector2Math.magnitude(distanceVector);
+				double dist = Vector2Math.magnitude(distanceVector);
 
 
 				//This is a virtual limit for how close the bodies can get. It doesn't actually limit the proximity to another body on screen.
@@ -93,14 +93,12 @@ public class PlanetHandler
 		}
 	}
 	
-	public static void computeForceP2P(Planet planet, Planet otherPlanet)
+	public static void computeForceBarnes(Planet planet, Planet otherPlanet)
 	{
 		if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
 		{
 			Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
-			float dist = Vector2Math.magnitude(distanceVector);
-
-			//if(dist < 1f) dist = 1f;
+			double dist = Vector2Math.magnitude(distanceVector) + Constants.SMOOTHING_PARAM;
 
 			Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
 
@@ -113,7 +111,7 @@ public class PlanetHandler
 		for(Planet otherPlanet : planets)
 		{
 			//We need to make sure we don't collide with oneself and don't collide with planets marked for delete (already collided with)
-			float diameter = (float) (2.0f*Math.sqrt(otherPlanet.mass));
+			double diameter = (double) (2.0f*Math.sqrt(otherPlanet.mass));
 			//if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < diameter/2) 
 			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < 2f) 
 			{
@@ -144,14 +142,14 @@ public class PlanetHandler
 	public static void makeOrbitAround(Planet center, Planet orbiter)
 	{
 		Vector2 distanceVector = Vector2Math.subtract(orbiter.position, center.position);
-		float dist = Vector2Math.magnitude(distanceVector);
+		double dist = Vector2Math.magnitude(distanceVector);
 		
 		//Use Fz(centripetal force) = Fg(gravitational force) and solve for the velocity
-		float velocityMag = (float) Math.sqrt(Constants.GRAVITATIONAL_CONSTANT * center.mass * (1/dist));
+		double velocityMag = Math.sqrt(Constants.GRAVITATIONAL_CONSTANT * center.mass * (1/dist));
 
 
-		float xDist = orbiter.position.x - center.position.x;
-		float yDist = orbiter.position.y - center.position.y;
+		double xDist = orbiter.position.x - center.position.x;
+		double yDist = orbiter.position.y - center.position.y;
 
 		//To create a perpendicular vector, switch components and one sign (+ -> - or - -> +).
 		Vector2 constructVector = Vector2Math.mult(new Vector2(-yDist, xDist), 1/dist);
@@ -160,11 +158,11 @@ public class PlanetHandler
 		orbiter.vel = newVelocityVector;
 	}
 
-	public static float getFrameTotalEnergy() {
-		float total = 0f;
+	public static double getFrameTotalEnergy() {
+		double total = 0f;
 		for(Planet p : PlanetHandler.planets) {
 			total += 0.5 * p.mass * (p.vel.x*p.vel.x+p.vel.y*p.vel.y);
-			float dist = Vector2Math.distance(p.position, Main.centerBlackHole.position);
+			double dist = Vector2Math.distance(p.position, Main.centerBlackHole.position);
 			if(dist == 0f) dist = 1f;
 			total += (Constants.GRAVITATIONAL_CONSTANT * p.mass * Main.centerBlackHole.mass)/dist;
 		}

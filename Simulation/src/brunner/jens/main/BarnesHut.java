@@ -27,12 +27,12 @@ public class BarnesHut
 	{
 		if(tree.bodies.size() == 1 && tree.bodies.get(0) != p)
 		{
-			PlanetHandler.computeForceP2P(p, tree.bodies.get(0));
+			PlanetHandler.computeForceBarnes(p, tree.bodies.get(0));
 			
-		}else if(tree.bodies.size() > 1 && Vector2Math.distance(p.position, new Vector2(tree.centerOfMass.x, tree.centerOfMass.y)) / tree.sideLength > 2)
+		}else if(tree.bodies.size() > 1 && tree.sideLength / Vector2Math.distance(p.position, new Vector2(tree.centerOfMass.x, tree.centerOfMass.y)) < 1)
 		{
 			Planet pseudoPlanet = new Planet(tree.centerOfMass.x, tree.centerOfMass.y, 0f, 0f, tree.totalMass);
-			PlanetHandler.computeForceP2P(p, pseudoPlanet);
+			PlanetHandler.computeForceBarnes(p, pseudoPlanet);
 			
 		}else
 		{
