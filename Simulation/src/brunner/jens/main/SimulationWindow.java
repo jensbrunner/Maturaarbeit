@@ -48,7 +48,7 @@ public class SimulationWindow extends JFrame
 		FloatSlider zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 1000, true);
 		JLabel zoomLabel = new JLabel();
 		
-		FloatSlider time = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 1000, true);
+		FloatSlider time = new FloatSlider(Scrollbar.VERTICAL, 1, 0, 0.0001, 1000, 1000, true);
 		JLabel timeLabel = new JLabel();
 		
 		JCheckBox blackHoleCheck = new JCheckBox();
@@ -127,7 +127,7 @@ public class SimulationWindow extends JFrame
 		});
 		
 		zoomLabel.setText(String.valueOf(Main.scaleFactor) + "x");
-		zoomLabel.setBounds(1920/2-30, 1080-20-20, 80, 10);
+		zoomLabel.setBounds(1920/2-15, 1080-20-20, 80, 10);
 		zoomLabel.setFocusable(false);
 		zoom.setBounds(1920/2-100, 1080-15, 200, 15);
 		zoom.addAdjustmentListener(new AdjustmentListener()
@@ -136,23 +136,25 @@ public class SimulationWindow extends JFrame
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				Main.scaleFactor = (float)zoom.getFloatValue();
-				zoomLabel.setText(Main.scaleFactor + "x");
+				double rounded = Math.floor(10000 * (double)Main.scaleFactor + 0.5) / 10000;
+				zoomLabel.setText(rounded + "x");
 				System.out.println("Change zoom to: " + Main.scaleFactor + "x");
 			}
 
 		});
 		
 		timeLabel.setText(String.valueOf(Main.timeScale) + "x");
-		timeLabel.setBounds(1920/2-30, 1080-150, 200, 15);
+		timeLabel.setBounds(1920-80, 1080/2, 80, 10);
 		timeLabel.setFocusable(false);
-		time.setBounds(1920/2-100, 1080-100, 200, 15);
+		time.setBounds(1920-15, 1080/2-100, 15, 200);
 		time.addAdjustmentListener(new AdjustmentListener()
 		{
 
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				Main.timeScale = (float)time.getFloatValue();
-				timeLabel.setText(Main.timeScale + "x");
+				double rounded = Math.floor(10000 * (double)Main.timeScale + 0.5) / 10000;
+				timeLabel.setText(rounded + "x");
 				System.out.println("Change time to: " + Main.timeScale + "x");
 			}
 
@@ -170,6 +172,7 @@ public class SimulationWindow extends JFrame
 				if(blackHoleCheck.isSelected())
 				{
 					Main.centerBlackHole = new Planet(1920/2f, 1080/2f, 0f, 0f, 100000);
+					Main.centerBlackHole.fixed = true;
 					PlanetHandler.planets.add(Main.centerBlackHole);
 				}else
 				{

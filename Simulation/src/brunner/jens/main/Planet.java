@@ -10,7 +10,7 @@ public class Planet
 	public Vector2 position;
 	public float mass;
 	public Vector2 vel, force;
-	public boolean delete;
+	public boolean fixed = false, delete = false;
 	
 	public Planet(float x, float y, float xVel, float yVel, float mass) 
 	{
@@ -25,8 +25,8 @@ public class Planet
 	{
 		this.position = new Vector2(ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.width),
 									ThreadLocalRandom.current().nextInt(0, Constants.WINDOW_DIMENSION.height));
-		this.vel = new Vector2(ThreadLocalRandom.current().nextInt(-100, 100),
-									ThreadLocalRandom.current().nextInt(-100, 100));
+		this.vel = new Vector2(ThreadLocalRandom.current().nextInt(-50, 50),
+									ThreadLocalRandom.current().nextInt(-50, 50));
 		mass = 10;
 		force = Constants.ZERO_VECTOR;
 		delete = false;

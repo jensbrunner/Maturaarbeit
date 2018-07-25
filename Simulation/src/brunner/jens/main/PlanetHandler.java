@@ -30,6 +30,9 @@ public class PlanetHandler
 
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
+			
+			//We don't want the center to move.
+			if(planet == Main.centerBlackHole) continue;
 
 			//computeForce(planet, i);
 			
@@ -40,7 +43,7 @@ public class PlanetHandler
 
 			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
-
+			
 			//However dv=a*dt
 			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime/1000.0f * Main.timeScale));
 
@@ -97,7 +100,7 @@ public class PlanetHandler
 			Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
 			float dist = Vector2Math.magnitude(distanceVector);
 
-			if(dist < 1f) dist = 1f;
+			//if(dist < 1f) dist = 1f;
 
 			Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
 
@@ -157,5 +160,14 @@ public class PlanetHandler
 		orbiter.vel = newVelocityVector;
 	}
 
-	
+	public static float getFrameTotalEnergy() {
+		float total = 0f;
+		for(Planet p : PlanetHandler.planets) {
+			total += 0.5 * p.mass * (p.vel.x*p.vel.x+p.vel.y*p.vel.y);
+			float dist = Vector2Math.distance(p.position, Main.centerBlackHole.position);
+			if(dist == 0f) dist = 1f;
+			total += (Constants.GRAVITATIONAL_CONSTANT * p.mass * Main.centerBlackHole.mass)/dist;
+		}
+		return total;
+	}
 }

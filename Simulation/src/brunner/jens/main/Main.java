@@ -35,7 +35,7 @@ public class Main
 			}
 			long newTime = System.currentTimeMillis();
 			long frameTime = newTime-currentTime;
-			System.out.println(frameTime);
+			//System.out.println(frameTime);
 			currentTime = newTime;
 			
 			if(reset)
@@ -46,11 +46,14 @@ public class Main
 				{
 					PlanetHandler.planets.remove(centerBlackHole);
 					centerBlackHole = new Planet(1920/2f, 1080/2f, 0f, 0f, 100000);
+					centerBlackHole.fixed = true;
 					PlanetHandler.planets.add(centerBlackHole);
 				}
 				reset = false;
 			}
-			if(Main.centerBlackHole != null) Main.centerBlackHole.position = new Vector2(1920/2f,1080/2f);
+			/*if(Main.centerBlackHole != null) {
+				System.out.println("Energy Total: " + PlanetHandler.getFrameTotalEnergy());
+			}*/
 			PlanetHandler.updatePlanets(frameTime);
 			simWind.repaint();
 		}

@@ -52,7 +52,6 @@ public class DrawingComponent extends JComponent
 		g2.drawLine((int)position.x, (int)position.y, (int)(position.x+vel.x/6), (int)(position.y+vel.y/6));
 		}
 	}
-	
 	public static void paintTree(Quadtree tree)
 	{
 		if(BarnesHut.root == null) return;
