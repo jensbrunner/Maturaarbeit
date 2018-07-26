@@ -41,8 +41,6 @@ public class PlanetHandler
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
 			if(Main.collisions) handleCollision(planet);
 
-			if(Main.bounded) handleBounds(planet);
-
 			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
 
@@ -58,6 +56,9 @@ public class PlanetHandler
 		{
 			Vector2 dDistVec = new Vector2(Main.timeScale*(frameTime)*(planet.vel.x), Main.timeScale*(frameTime)*(planet.vel.y));
 			planet.position = Vector2Math.add(planet.position, dDistVec);
+			
+			//If we don't handle the bounds/adjust the positions after having calculated the positions from the velocity, they'll all be one frame behind the border, which is terrible looking.
+			if(Main.bounded) handleBounds(planet);
 		}
 
 		ArrayList<Planet> toRemove = new ArrayList<Planet>();

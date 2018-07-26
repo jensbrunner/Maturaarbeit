@@ -11,6 +11,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
 import brunner.jens.interaction.MouseListener;
@@ -19,26 +22,43 @@ import brunner.jens.utils.FloatSlider;
 
 public class SimulationWindow extends JFrame 
 {
-	private static final long serialVersionUID = 1L;
-
 	public static JLabel timePassed = new JLabel();
 	public static JLabel fpsCounter = new JLabel();
+	public static OptionWindow optionWindow;
 	
 	public SimulationWindow()
 	{
 		super("n-Body Simulation");
 		//setLayout(null); If we remove the comment, the Component will not be displayed. Check documentation
 		//setSize(Constants.WINDOW_DIMENSION);
-
+		
 		setUndecorated(true);
 		setExtendedState(JFrame.MAXIMIZED_BOTH); 		
 		getContentPane().setBackground(Color.BLACK);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		optionWindow = new OptionWindow();
+
+		
 		JButton closeButton = new JButton();
 		JButton resetButton = new JButton();
 		JButton orbitButton = new JButton();
+		
+		JButton optionsButton = new JButton();
+		optionsButton.setBounds(1920-80, 1080-20, 80, 20);
+		optionsButton.setText("Options");
+		optionsButton.setFocusable(false);
+		optionsButton.setBorderPainted(false);
+		optionsButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				optionWindow.setVisible(!optionWindow.isVisible());
+			}
+		});
+		
 		JTextField planetAmount = new JTextField();
 		
 		FloatSlider zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 1000, true);
@@ -46,12 +66,6 @@ public class SimulationWindow extends JFrame
 		
 		FloatSlider time = new FloatSlider(Scrollbar.VERTICAL, 1, 0, 0.0001, 1000, 1000, true);
 		JLabel timeLabel = new JLabel();
-		
-		JCheckBox blackHoleCheck = new JCheckBox();
-		JCheckBox showVelocityCheck = new JCheckBox();
-		JCheckBox quadTreeCheck = new JCheckBox();
-		JCheckBox collisionCheck = new JCheckBox();
-		JCheckBox boundsCheck = new JCheckBox();
 		
 		closeButton.setBounds(1920-70, 0, 70, 20);
 		closeButton.setText("Close");
@@ -157,105 +171,6 @@ public class SimulationWindow extends JFrame
 
 		});
 		
-		blackHoleCheck.setText("Center Black Hole");
-		blackHoleCheck.setSelected(Main.centerBlackHole != null);
-		blackHoleCheck.setBounds(1920-130, 1080-20, 130, 20);
-		blackHoleCheck.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if(blackHoleCheck.isSelected())
-				{
-					Main.centerBlackHole = new Planet(1920/2f, 1080/2f, 0f, 0f, Main.blackHoleMass);
-					Main.centerBlackHole.fixed = true;
-					PlanetHandler.planets.add(Main.centerBlackHole);
-				}else
-				{
-					PlanetHandler.planets.remove(Main.centerBlackHole);
-					Main.centerBlackHole = null;
-				}
-			}
-		});
-		
-		showVelocityCheck.setText("Display Velocity");
-		showVelocityCheck.setSelected(Main.showVelocityArrows);
-		showVelocityCheck.setBounds(1920-130, 1080-20-20, 130, 20);
-		showVelocityCheck.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if(showVelocityCheck.isSelected())
-				{
-					Main.showVelocityArrows = true;
-				}else
-				{
-					Main.showVelocityArrows = false;
-				}
-			}
-		});
-		
-		quadTreeCheck.setText("Display Quadtree");
-		quadTreeCheck.setSelected(Main.quadTree);
-		quadTreeCheck.setBounds(1920-130, 1080-20-20-20, 130, 20);
-		quadTreeCheck.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if(quadTreeCheck.isSelected())
-				{
-					Main.quadTree = true;
-				}else
-				{
-					Main.quadTree = false;
-				}
-			}
-		});
-		
-		collisionCheck.setText("Collisions");
-		collisionCheck.setSelected(Main.collisions);
-		collisionCheck.setBounds(1920-130, 1080-20-20-20-20, 130, 20);
-		collisionCheck.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if(collisionCheck.isSelected())
-				{
-					Main.collisions = true;
-				}else
-				{
-					Main.collisions = false;
-				}
-			}
-		});
-		
-		boundsCheck.setText("Bounded");
-		boundsCheck.setSelected(Main.bounded);
-		boundsCheck.setBounds(1920-130, 1080-20-20-20-20-20, 130, 20);
-		boundsCheck.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if(boundsCheck.isSelected())
-				{
-					Main.isBounding = true;
-				}else
-				{
-					Main.boundingAcceptable = false;
-					Main.bounded = false;
-				}
-			}
-		});
-		
 		timePassed.setText(Main.timeCounter + " sec");
 		timePassed.setForeground(Color.WHITE);
 		timePassed.setFocusable(false);
@@ -267,21 +182,18 @@ public class SimulationWindow extends JFrame
 		fpsCounter.setBounds(10+100, 0, 100, 50);
 
 		DrawingComponent draw = new DrawingComponent();
-		draw.add(closeButton);
-		draw.add(resetButton);
-		draw.add(orbitButton);
-		draw.add(planetAmount);
-		draw.add(zoom);
-		draw.add(zoomLabel);
-		draw.add(time);
-		draw.add(timeLabel);
-		draw.add(blackHoleCheck);
-		draw.add(showVelocityCheck);
-		draw.add(quadTreeCheck);
-		draw.add(collisionCheck);
-		draw.add(boundsCheck);
-		draw.add(timePassed);
-		draw.add(fpsCounter);
+		add(closeButton);
+		add(resetButton);
+		add(orbitButton);
+		add(optionsButton);
+		add(planetAmount);
+		add(zoom);
+		add(zoomLabel);
+		add(time);
+		add(timeLabel);
+		
+		add(timePassed);
+		add(fpsCounter);
 		
 		//Adding the listeners
 		addMouseListener(new MouseListener());
