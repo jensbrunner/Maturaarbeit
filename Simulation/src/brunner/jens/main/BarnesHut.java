@@ -13,7 +13,7 @@ public class BarnesHut
 	public static void insertBodies()
 	{
 		//This is the root node. For now, arbitrary values. Reset to null as not to take values from last frame.
-		root = new Quadtree(-10000, -10000, 20000);
+		root = new Quadtree(-100000, -100000, 200000);
 
 		for(Planet p : PlanetHandler.planets)
 		{

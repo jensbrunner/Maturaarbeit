@@ -13,6 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import brunner.jens.interaction.MouseListener;
+import brunner.jens.interaction.MouseMotionListener;
 import brunner.jens.utils.FloatSlider;
 
 public class SimulationWindow extends JFrame 
@@ -20,6 +22,7 @@ public class SimulationWindow extends JFrame
 	private static final long serialVersionUID = 1L;
 
 	public static JLabel timePassed = new JLabel();
+	public static JLabel fpsCounter = new JLabel();
 	
 	public SimulationWindow()
 	{
@@ -48,6 +51,7 @@ public class SimulationWindow extends JFrame
 		JCheckBox showVelocityCheck = new JCheckBox();
 		JCheckBox quadTreeCheck = new JCheckBox();
 		JCheckBox collisionCheck = new JCheckBox();
+		JCheckBox boundsCheck = new JCheckBox();
 		
 		closeButton.setBounds(1920-70, 0, 70, 20);
 		closeButton.setText("Close");
@@ -164,7 +168,7 @@ public class SimulationWindow extends JFrame
 			{
 				if(blackHoleCheck.isSelected())
 				{
-					Main.centerBlackHole = new Planet(1920/2f, 1080/2f, 0f, 0f, 100000);
+					Main.centerBlackHole = new Planet(1920/2f, 1080/2f, 0f, 0f, Main.blackHoleMass);
 					Main.centerBlackHole.fixed = true;
 					PlanetHandler.planets.add(Main.centerBlackHole);
 				}else
@@ -212,6 +216,7 @@ public class SimulationWindow extends JFrame
 				}
 			}
 		});
+		
 		collisionCheck.setText("Collisions");
 		collisionCheck.setSelected(Main.collisions);
 		collisionCheck.setBounds(1920-130, 1080-20-20-20-20, 130, 20);
@@ -231,10 +236,35 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
+		boundsCheck.setText("Bounded");
+		boundsCheck.setSelected(Main.bounded);
+		boundsCheck.setBounds(1920-130, 1080-20-20-20-20-20, 130, 20);
+		boundsCheck.addActionListener(new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				if(boundsCheck.isSelected())
+				{
+					Main.isBounding = true;
+				}else
+				{
+					Main.boundingAcceptable = false;
+					Main.bounded = false;
+				}
+			}
+		});
+		
 		timePassed.setText(Main.timeCounter + " sec");
 		timePassed.setForeground(Color.WHITE);
 		timePassed.setFocusable(false);
 		timePassed.setBounds(10, 0, 100, 50);
+		
+		fpsCounter.setText("");
+		fpsCounter.setForeground(Color.WHITE);
+		fpsCounter.setFocusable(false);
+		fpsCounter.setBounds(10+100, 0, 100, 50);
 
 		DrawingComponent draw = new DrawingComponent();
 		draw.add(closeButton);
@@ -249,7 +279,14 @@ public class SimulationWindow extends JFrame
 		draw.add(showVelocityCheck);
 		draw.add(quadTreeCheck);
 		draw.add(collisionCheck);
+		draw.add(boundsCheck);
 		draw.add(timePassed);
+		draw.add(fpsCounter);
+		
+		//Adding the listeners
+		addMouseListener(new MouseListener());
+		addMouseMotionListener(new MouseMotionListener());
+		
 		add(draw);
 		setVisible(true);
 	}

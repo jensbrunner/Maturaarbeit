@@ -2,14 +2,20 @@ package brunner.jens.utils;
 
 public class Vector2Math
 {
-	public static double magnitude(Vector2 vector)
+	public static double magnitude(Vector2 vec)
 	{
-		return Math.sqrt(Math.pow(vector.x, 2.0)+Math.pow(vector.y, 2.0));
+		return Math.sqrt(vec.x*vec.x+vec.y*vec.y);
 	}
 	
 	public static double distance(Vector2 vec1, Vector2 vec2)
 	{
 		return Math.abs(magnitude(subtract(vec1, vec2)));
+	}
+	
+	public static double distance2(Vector2 vec1, Vector2 vec2)
+	{
+		Vector2 diff = subtract(vec1, vec2);
+		return diff.x*diff.x+diff.y*diff.y;
 	}
 	
 	public static Vector2 subtract(Vector2 vec1, Vector2 vec2)

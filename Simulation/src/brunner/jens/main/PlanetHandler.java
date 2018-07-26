@@ -22,7 +22,7 @@ public class PlanetHandler
 	public static void updatePlanets(long frameTime)
 	{
 		BarnesHut.insertBodies();
-		
+
 		//We use a counting iterator because it's easier to solve the problem where we calculate the force per pair twice instead of just once necessary. 
 		for(int i = 0; i < planets.size(); i++)
 		{
@@ -30,20 +30,22 @@ public class PlanetHandler
 
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
-			
+
 			//Don't affect fixed planets.
 			if(planet.fixed) continue;
 
 			//computeForce(planet, i, frameTime);
-			
+
 			BarnesHut.doPhysics(planet, BarnesHut.root);
 
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
 			if(Main.collisions) handleCollision(planet);
 
+			if(Main.bounded) handleBounds(planet);
+
 			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
-			
+
 			//However dv=a*dt
 			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime * Main.timeScale));
 
@@ -92,7 +94,7 @@ public class PlanetHandler
 			}
 		}
 	}
-	
+
 	public static void computeForceBarnes(Planet planet, Planet otherPlanet)
 	{
 		if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
@@ -139,11 +141,40 @@ public class PlanetHandler
 		}
 	}
 
+	private static void handleBounds(Planet p) {
+		if(Main.bounded) {
+			if(p.position.x < Main.boundVec.x)
+			{
+				p.position.x = Main.boundVec.x;
+				p.vel.x *= -0.1;
+			}
+			if(p.position.x > Main.boundVec2.x)
+			{
+				p.position.x = Main.boundVec2.x;
+				p.vel.x *= -0.1;
+			}
+			if(p.position.y < Main.boundVec.y)
+			{
+				p.position.y = Main.boundVec.y;
+				p.vel.y *= -0.1;
+			}
+			if(p.position.y > Main.boundVec2.y)
+			{
+				p.position.y = Main.boundVec2.y;
+				p.vel.y *= -0.1;
+			}
+			else {
+				return;
+			}
+			//p.vel = Constants.ZERO_VECTOR;
+		}
+	}
+
 	public static void makeOrbitAround(Planet center, Planet orbiter)
 	{
 		Vector2 distanceVector = Vector2Math.subtract(orbiter.position, center.position);
 		double dist = Vector2Math.magnitude(distanceVector);
-		
+
 		//Use Fz(centripetal force) = Fg(gravitational force) and solve for the velocity
 		double velocityMag = Math.sqrt(Constants.GRAVITATIONAL_CONSTANT * center.mass * (1/dist));
 
