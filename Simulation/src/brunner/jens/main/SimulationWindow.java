@@ -18,12 +18,18 @@ import javax.swing.JTextField;
 
 import brunner.jens.interaction.MouseListener;
 import brunner.jens.interaction.MouseMotionListener;
+import brunner.jens.interaction.MouseWheelListener;
+import brunner.jens.utils.Constants;
 import brunner.jens.utils.FloatSlider;
 
 public class SimulationWindow extends JFrame 
 {
 	public static JLabel timePassed = new JLabel();
 	public static JLabel fpsCounter = new JLabel();
+	public static JLabel zoomLabel = new JLabel();
+	public static FloatSlider zoom;
+	public static JLabel timeLabel = new JLabel();
+	public static FloatSlider time;
 	public static OptionWindow optionWindow;
 	
 	public SimulationWindow()
@@ -61,11 +67,9 @@ public class SimulationWindow extends JFrame
 		
 		JTextField planetAmount = new JTextField();
 		
-		FloatSlider zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 1000, true);
-		JLabel zoomLabel = new JLabel();
+		zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 10000, true);
 		
-		FloatSlider time = new FloatSlider(Scrollbar.VERTICAL, 1, 0, 0.0001, 1000, 1000, true);
-		JLabel timeLabel = new JLabel();
+		time = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 1000, 10000, true);
 		
 		closeButton.setBounds(1920-70, 0, 70, 20);
 		closeButton.setText("Close");
@@ -137,10 +141,10 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
-		zoomLabel.setText(String.valueOf(Main.scaleFactor) + "x");
-		zoomLabel.setBounds(1920/2-15, 1080-20-20, 80, 10);
+		zoomLabel.setText("Zoom: " + String.valueOf(Main.scaleFactor) + "x");
+		zoomLabel.setBounds(Constants.WINDOW_DIMENSION.width/2-400+60, 1080-40-10, 200, 10);
 		zoomLabel.setFocusable(false);
-		zoom.setBounds(1920/2-100, 1080-15, 200, 15);
+		zoom.setBounds(Constants.WINDOW_DIMENSION.width/2-400, 1080-15-10, 200, 15);
 		zoom.addAdjustmentListener(new AdjustmentListener()
 		{
 
@@ -148,16 +152,16 @@ public class SimulationWindow extends JFrame
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				Main.scaleFactor = zoom.getFloatValue();
 				double rounded = Math.floor(10000 * (double)Main.scaleFactor + 0.5) / 10000;
-				zoomLabel.setText(rounded + "x");
+				zoomLabel.setText("Zoom: " + rounded + "x");
 				System.out.println("Change zoom to: " + Main.scaleFactor + "x");
 			}
 
 		});
 		
-		timeLabel.setText(String.valueOf(Main.timeScale) + "x");
-		timeLabel.setBounds(1920-80, 1080/2, 80, 10);
+		timeLabel.setText("Time: " + String.valueOf(Main.timeScale) + "x");
+		timeLabel.setBounds(Constants.WINDOW_DIMENSION.width/2+260, 1080-40-10, 200, 10);
 		timeLabel.setFocusable(false);
-		time.setBounds(1920-15, 1080/2-100, 15, 200);
+		time.setBounds(Constants.WINDOW_DIMENSION.width/2+200, 1080-15-10, 200, 15);
 		time.addAdjustmentListener(new AdjustmentListener()
 		{
 
@@ -165,10 +169,9 @@ public class SimulationWindow extends JFrame
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				Main.timeScale = time.getFloatValue();
 				double rounded = Math.floor(10000 * (double)Main.timeScale + 0.5) / 10000;
-				timeLabel.setText(rounded + "x");
+				timeLabel.setText("Time: " + rounded + "x");
 				System.out.println("Change time to: " + Main.timeScale + "x");
 			}
-
 		});
 		
 		timePassed.setText(Main.timeCounter + " sec");
@@ -198,6 +201,7 @@ public class SimulationWindow extends JFrame
 		//Adding the listeners
 		addMouseListener(new MouseListener());
 		addMouseMotionListener(new MouseMotionListener());
+		addMouseWheelListener(new MouseWheelListener());
 		
 		add(draw);
 		setVisible(true);

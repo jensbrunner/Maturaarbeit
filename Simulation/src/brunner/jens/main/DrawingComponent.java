@@ -28,18 +28,22 @@ public class DrawingComponent extends JComponent
 
 		//In this method we need to paint all the planets. We'll ask the PlanetHandler
 		//for a list of the planets. TODO: Eventually make drawPlanets method.
-		g2.setColor(Color.WHITE);
+		
 		for(Planet p : PlanetHandler.planets)
 		{
+			g2.setColor(Color.WHITE);
 			DrawingComponent.paintBody(translateToScreen(p.position), p.vel);
 		}
 		if(Main.bounded || (Main.isBounding && Main.boundingAcceptable)) {
 			g2.setColor(Color.DARK_GRAY);
 			Vector2 bounds = translateToScreen(Main.boundVec);
 			Vector2 bounds2 = translateToScreen(Main.boundVec2);
-			g2.drawRect((int)bounds.x, (int)bounds.y, (int)(bounds2.x-bounds.x), (int)(bounds2.y-bounds.y));
+			
+			//We slightly adjust the drawed positions based on trial and error to give the border a good look.
+			g2.drawRect((int)bounds.x-1, (int)bounds.y-1, (int)(bounds2.x-bounds.x)+2, (int)(bounds2.y-bounds.y)+2);
 		}
 		if(Main.quadTree) {
+			g2.setColor(Color.WHITE);
 			DrawingComponent.paintTree(BarnesHut.paintTree);
 		}
 	}
