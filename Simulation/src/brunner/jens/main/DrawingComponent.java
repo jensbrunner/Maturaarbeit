@@ -1,9 +1,11 @@
 package brunner.jens.main;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 
 import javax.swing.JComponent;
@@ -25,11 +27,12 @@ public class DrawingComponent extends JComponent
 	public void paintComponent(Graphics g)
 	{
 		g2 = (Graphics2D) g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		//In this method we need to paint all the planets. We'll ask the PlanetHandler
 		//for a list of the planets. TODO: Eventually make drawPlanets method.
 		
-		for(Planet p : PlanetHandler.planets)
+		for(Body p : BodyHandler.planets)
 		{
 			g2.setColor(Color.WHITE);
 			DrawingComponent.paintBody(translateToScreen(p.position), p.vel);
@@ -39,10 +42,10 @@ public class DrawingComponent extends JComponent
 			Vector2 bounds = translateToScreen(Main.boundVec);
 			Vector2 bounds2 = translateToScreen(Main.boundVec2);
 			
-			//We slightly adjust the drawed positions based on trial and error to give the border a good look.
+			//We slightly adjust the drawn positions based on trial and error to give the border a good look.
 			g2.drawRect((int)bounds.x-1, (int)bounds.y-1, (int)(bounds2.x-bounds.x)+2, (int)(bounds2.y-bounds.y)+2);
 		}
-		if(Main.quadTree) {
+		if(Main.quadTree && BarnesHut.paintTree != null) {
 			g2.setColor(Color.WHITE);
 			DrawingComponent.paintTree(BarnesHut.paintTree);
 		}
@@ -61,7 +64,8 @@ public class DrawingComponent extends JComponent
 	public static void paintTree(Quadtree tree)
 	{
 		if(BarnesHut.root == null) return;
-		g2.drawRect(tree.x, tree.y, tree.sideLength, tree.sideLength);
+		Vector2 drawPos = translateToScreen(new Vector2(tree.x, tree.y));
+		g2.drawRect((int)drawPos.x, (int)drawPos.y, (int)(tree.sideLength*Main.scaleFactor), (int)(tree.sideLength*Main.scaleFactor));
 		if(tree.ne != null) paintTree(tree.ne);
 		if(tree.nw != null) paintTree(tree.nw);
 		if(tree.se != null) paintTree(tree.sw);

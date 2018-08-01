@@ -48,8 +48,78 @@ public class SimulationWindow extends JFrame
 
 		
 		JButton closeButton = new JButton();
+		closeButton.setBounds(1920-70, 0, 70, 20);
+		closeButton.setText("Close");
+		closeButton.setFocusable(false);
+		closeButton.setBorderPainted(false);
+		closeButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Main.close = true;
+			}
+		});
+		
+		JTextField bodyAmount = new JTextField();
+		bodyAmount.setText(String.valueOf(Main.planetAmount));
+		bodyAmount.setBounds(1920-70-70-70-100, 0, 100, 20);
+		bodyAmount.addActionListener(new ActionListener()
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				try
+				{
+					Main.planetAmount = Integer.parseInt(bodyAmount.getText());
+					Main.reset = true;
+				} catch(NumberFormatException e) {
+					System.out.println("Entry is not an integer.");
+					bodyAmount.setText("NaN");
+				}
+				
+			}
+		});
+		
 		JButton resetButton = new JButton();
+		resetButton.setBounds(1920-70-70, 0, 70, 20);
+		resetButton.setText("Reset");
+		resetButton.setFocusable(false);
+		resetButton.setBorderPainted(false);
+		resetButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				bodyAmount.postActionEvent();
+				Main.reset = true;
+			}
+		});
+		
 		JButton orbitButton = new JButton();
+		orbitButton.setBounds(1920-70-70-70, 0, 70, 20);
+		orbitButton.setText("Orbit");
+		orbitButton.setFocusable(false);
+		orbitButton.setBorderPainted(false);
+		orbitButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Body curMass = null;
+				for(Body p : BodyHandler.planets)
+				{
+					if(curMass == null) curMass = p;
+					else if(p.mass > curMass.mass) curMass = p;
+				}
+				for(Body p : BodyHandler.planets)
+				{
+					if(p == curMass) continue;
+					BodyHandler.makeOrbitAround(curMass, p);
+				}
+			}
+		});
 		
 		JButton optionsButton = new JButton();
 		optionsButton.setBounds(1920-80, 1080-20, 80, 20);
@@ -65,82 +135,9 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
-		JTextField planetAmount = new JTextField();
+		
 		
 		zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 10000, true);
-		
-		time = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 1000, 10000, true);
-		
-		closeButton.setBounds(1920-70, 0, 70, 20);
-		closeButton.setText("Close");
-		closeButton.setFocusable(false);
-		closeButton.setBorderPainted(false);
-		closeButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				Main.close = true;
-			}
-		});
-		
-		resetButton.setBounds(1920-70-70, 0, 70, 20);
-		resetButton.setText("Reset");
-		resetButton.setFocusable(false);
-		resetButton.setBorderPainted(false);
-		resetButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				planetAmount.postActionEvent();
-				Main.reset = true;
-			}
-		});
-		
-		orbitButton.setBounds(1920-70-70-70, 0, 70, 20);
-		orbitButton.setText("Orbit");
-		orbitButton.setFocusable(false);
-		orbitButton.setBorderPainted(false);
-		orbitButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				Planet curMass = null;
-				for(Planet p : PlanetHandler.planets)
-				{
-					if(curMass == null) curMass = p;
-					else if(p.mass > curMass.mass) curMass = p;
-				}
-				for(Planet p : PlanetHandler.planets)
-				{
-					if(p == curMass) continue;
-					PlanetHandler.makeOrbitAround(curMass, p);
-				}
-			}
-		});
-		
-		planetAmount.setText(String.valueOf(Main.planetAmount));
-		planetAmount.setBounds(1920-70-70-70-100, 0, 100, 20);
-		planetAmount.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				try
-				{
-					Main.planetAmount = Integer.parseInt(planetAmount.getText());
-					Main.reset = true;
-				} catch(NumberFormatException e) {
-					System.out.println("Entry is not an integer.");
-					planetAmount.setText("NaN");
-				}
-				
-			}
-		});
-		
 		zoomLabel.setText("Zoom: " + String.valueOf(Main.scaleFactor) + "x");
 		zoomLabel.setBounds(Constants.WINDOW_DIMENSION.width/2-400+60, 1080-40-10, 200, 10);
 		zoomLabel.setFocusable(false);
@@ -158,6 +155,7 @@ public class SimulationWindow extends JFrame
 
 		});
 		
+		time = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 1000, 10000, true);
 		timeLabel.setText("Time: " + String.valueOf(Main.timeScale) + "x");
 		timeLabel.setBounds(Constants.WINDOW_DIMENSION.width/2+260, 1080-40-10, 200, 10);
 		timeLabel.setFocusable(false);
@@ -189,7 +187,7 @@ public class SimulationWindow extends JFrame
 		add(resetButton);
 		add(orbitButton);
 		add(optionsButton);
-		add(planetAmount);
+		add(bodyAmount);
 		add(zoom);
 		add(zoomLabel);
 		add(time);

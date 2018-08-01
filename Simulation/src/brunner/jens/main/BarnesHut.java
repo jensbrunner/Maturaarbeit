@@ -1,5 +1,6 @@
 package brunner.jens.main;
 
+import brunner.jens.utils.Constants;
 import brunner.jens.utils.Vector2;
 import brunner.jens.utils.Vector2Math;
 
@@ -10,29 +11,55 @@ public class BarnesHut
 	public static Quadtree root;
 	public static Quadtree paintTree;
 
+	//public static int numNodes = 0;
+	
 	public static void insertBodies()
 	{
-		//This is the root node. For now, arbitrary values. Reset to null as not to take values from last frame.
-		root = new Quadtree(-100000, -100000, 200000);
-
-		for(Planet p : PlanetHandler.planets)
+		//To get the optimal Quadtree, find the topleft-most body and the largest coordinate value from that top
+		//TODO: For some reason this technique is extremely costly as the tree grows bigger.
+		/*double xmin = Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		
+		double max = Double.MIN_VALUE;
+		for(Planet p : PlanetHandler.planets) {
+			double x = p.position.x;
+			double y = p.position.y;
+			if(x < xmin) xmin = x;
+			if(y < ymin) ymin = y;
+			
+			if(x-xmin > max) {
+				max = x-xmin;
+			}
+			if(y-ymin > max) {
+				max = y-ymin;
+			}
+		}*/
+		
+		//This is the root node. Position it according to the values found prior. Add a buffer of 1 distance unit.
+		//BarnesHut.root = new Quadtree(xmin-1, ymin-1, max+1);
+		//Anything outside this tree will not be interacted WITH. But can still be interacted UPON by other nodes.
+		BarnesHut.root = new Quadtree(-10000+Constants.WINDOW_DIMENSION.width/2, -10000+Constants.WINDOW_DIMENSION.height/2, 20000);
+		
+		for(Body p : BodyHandler.planets)
 		{
-			root.putBody(p);
+			BarnesHut.root.putBody(p);
 		}
 		//Update the tree we want DrawingComponent to paint once the root tree is fully constructed.
-		paintTree = root;
+		if(Main.quadTree) {
+			BarnesHut.paintTree = BarnesHut.root;
+		}
 	}
 
-	public static void doPhysics(Planet p, Quadtree tree)
+	public static void doPhysics(Body p, Quadtree tree)
 	{
 		if(tree.bodies.size() == 1 && tree.bodies.get(0) != p)
 		{
-			PlanetHandler.computeForceBarnes(p, tree.bodies.get(0));
+			BodyHandler.computeForceBarnes(p, tree.bodies.get(0));
 			
 		}else if(tree.bodies.size() > 1 && tree.sideLength / Vector2Math.distance(p.position, new Vector2(tree.centerOfMass.x, tree.centerOfMass.y)) < 1)
 		{
-			Planet pseudoPlanet = new Planet(tree.centerOfMass.x, tree.centerOfMass.y, 0f, 0f, tree.totalMass);
-			PlanetHandler.computeForceBarnes(p, pseudoPlanet);
+			Body pseudoPlanet = new Body(tree.centerOfMass.x, tree.centerOfMass.y, 0f, 0f, tree.totalMass);
+			BodyHandler.computeForceBarnes(p, pseudoPlanet);
 			
 		}else
 		{

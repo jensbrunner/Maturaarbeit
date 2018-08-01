@@ -43,6 +43,7 @@ public class MouseListener implements java.awt.event.MouseListener {
 	public void mouseReleased(MouseEvent e) {
 		if(Main.isBounding && Main.boundingAcceptable) {
 			Main.isBounding = false;
+			Main.boundingAcceptable = false;
 			Main.bounded = true;
 		}
 

@@ -8,9 +8,9 @@ public class Quadtree
 {
 
 	//The x,y coordinate of the top-left corner.
-	public int x,y,sideLength;
+	public double x,y,sideLength;
 
-	public Quadtree(int _x, int _y, int _sideLength)
+	public Quadtree(double _x, double _y, double _sideLength)
 	{
 		//This is the x,y coordinate of the top-left corner
 		x = _x;
@@ -23,18 +23,18 @@ public class Quadtree
 	public Quadtree se = null;
 	public Quadtree sw = null;
 
-	public CopyOnWriteArrayList<Planet> bodies = new CopyOnWriteArrayList<>();
+	public CopyOnWriteArrayList<Body> bodies = new CopyOnWriteArrayList<>();
 
 	public double totalMass;
 	public Vector2 centerOfMass;
 
-	public boolean containsBody(Planet p) {
-		if(p.position.x > x && p.position.x < x + sideLength &&
-		   p.position.y > y && p.position.y < y + sideLength) return true;
+	public boolean containsBody(Body p) {
+		if(p.position.x >= x && p.position.x < x + sideLength &&
+		   p.position.y >= y && p.position.y < y + sideLength) return true;
 		return false;
 	}
 
-	public void putBody(Planet p)
+	public void putBody(Body p)
 	{
 		// If this node is an internal
 		if(bodies.size() > 1)
@@ -51,7 +51,7 @@ public class Quadtree
 
 			double x = 0f;
 			double y = 0f;
-			for(Planet _p : bodies)
+			for(Body _p : bodies)
 			{
 				x += _p.position.x * _p.mass;
 				y += _p.position.y * _p.mass;
@@ -65,6 +65,8 @@ public class Quadtree
 		
 		}else if(bodies.size() == 1)
 		{
+			//BarnesHut.numNodes += 4;
+			
 			ne = new Quadtree(x + sideLength/2, y, sideLength/2);
 			nw = new Quadtree(x, y, sideLength/2);
 			se = new Quadtree(x + sideLength/2, y + sideLength/2, sideLength/2);
@@ -72,7 +74,7 @@ public class Quadtree
 
 			bodies.add(p);
 			
-			for(Planet _p : bodies)
+			for(Body _p : bodies)
 			{
 				if(ne.containsBody(_p))
 				{
@@ -95,7 +97,7 @@ public class Quadtree
 
 			double x = 0f;
 			double y = 0f;
-			for(Planet _p : bodies)
+			for(Body _p : bodies)
 			{
 				x += _p.position.x * _p.mass;
 				y += _p.position.y * _p.mass;

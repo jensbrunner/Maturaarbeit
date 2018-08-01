@@ -19,7 +19,7 @@ public class MouseMotionListener implements java.awt.event.MouseMotionListener {
 			Vector2 scaled = Vector2Math.mult(Vector2Math.subtract(vec,diff), 1./Main.scaleFactor);
 			Vector2 drawPos = Vector2Math.add(scaled, diff);
 
-			if(e.getX() > Main.boundVec.x && e.getY() > Main.boundVec.y) {
+			if(drawPos.x > Main.boundVec.x && drawPos.y > Main.boundVec.y) {
 				Main.boundVec2 = new Vector2(drawPos.x, drawPos.y);
 				Main.boundingAcceptable = true;
 			}else {

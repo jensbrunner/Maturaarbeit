@@ -7,27 +7,27 @@ import brunner.jens.utils.Constants;
 import brunner.jens.utils.Vector2;
 import brunner.jens.utils.Vector2Math;
 
-public class PlanetHandler 
+public class BodyHandler 
 {
-	public static CopyOnWriteArrayList<Planet> planets = new CopyOnWriteArrayList<Planet>(); 
+	public static CopyOnWriteArrayList<Body> planets = new CopyOnWriteArrayList<Body>(); 
 
 	public static void createRandomPlanets(int amount)
 	{
 		for(int i = 0; i < amount; i++)
 		{
-			planets.add(new Planet());
+			planets.add(new Body());
 		}
 	}
 
 	public static void updatePlanets(long frameTime)
 	{
 		BarnesHut.insertBodies();
-
+		
 		//We use a counting iterator because it's easier to solve the problem where we calculate the force per pair twice instead of just once necessary. 
 		for(int i = 0; i < planets.size(); i++)
 		{
-			Planet planet = planets.get(i);
-
+			Body planet = planets.get(i);
+			
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
 
@@ -41,39 +41,46 @@ public class PlanetHandler
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
 			if(Main.collisions) handleCollision(planet);
 
-			//Compute the acceleration (directly correlated to the force), independant of time! a=F/m
+			//Compute the acceleration a=F/m
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
 
-			//However dv=a*dt
-			planet.vel = Vector2Math.add(planet.vel, Vector2Math.mult(accel, frameTime * Main.timeScale));
-
+			Vector2 finalv = Vector2Math.mult(accel, frameTime * Main.timeScale);
+			
+			//Since we want to model reality, use the AVERAGE velocity during the frame, that is the area of a triangle in a v-t graph.
+			planet.lastv = Vector2Math.mult(finalv, 0.5);
+			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
+			
 			//net force PER FRAME, so reset it.
 			planet.force = Constants.ZERO_VECTOR;
 		}
 
-		//Finally, we update the positions. Note that even here, we have to account for the time that is passing as s=v*t.
-		for(Planet planet : planets)
+		//Finally, we update the positions. Note that even here, we have to account for the time that is passing as s=v*t. This has to be done after all of the force calculations have occured.
+		//Also: the BarnesHut operation must be done on a static tree with non-moving particles. Thus handling the actual movement has to be separate.
+		for(Body planet : planets)
 		{
-			Vector2 dDistVec = new Vector2(Main.timeScale*(frameTime)*(planet.vel.x), Main.timeScale*(frameTime)*(planet.vel.y));
-			planet.position = Vector2Math.add(planet.position, dDistVec);
+			Vector2 moveV = Vector2Math.add(planet.vel, planet.lastv);
+			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(moveV, Main.timeScale*frameTime));
+			
+			//Add the last half the finalv to finish the frame with the correct end-velocity.
+			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
 			
 			//If we don't handle the bounds/adjust the positions after having calculated the positions from the velocity, they'll all be one frame behind the border, which is terrible looking.
 			if(Main.bounded) handleBounds(planet);
 		}
 
-		ArrayList<Planet> toRemove = new ArrayList<Planet>();
-		for(Planet planet : planets)
+		ArrayList<Body> toRemove = new ArrayList<Body>();
+		for(Body planet : planets)
 		{
 			if(planet.delete) toRemove.add(planet);
 		}
 		planets.removeAll(toRemove);
 	}
 
-	private static void computeForce(Planet planet, int i)
+	private static void computeForce(Body planet, int i)
 	{
 		for(int j = i+1; j < planets.size(); j++)
 		{
-			Planet otherPlanet = planets.get(j);
+			Body otherPlanet = planets.get(j);
 
 			//Also here, if we are deleting the planet, don't interact with it.
 			if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
@@ -96,12 +103,12 @@ public class PlanetHandler
 		}
 	}
 
-	public static void computeForceBarnes(Planet planet, Planet otherPlanet)
+	public static void computeForceBarnes(Body planet, Body otherPlanet)
 	{
 		if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
 		{
 			Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
-			double dist = Vector2Math.magnitude(distanceVector) + Constants.SMOOTHING_PARAM;
+			double dist = Vector2Math.magnitude(distanceVector) + Main.smoothingParam;
 
 			Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
 
@@ -109,9 +116,9 @@ public class PlanetHandler
 		}
 	}
 
-	private static void handleCollision(Planet planet)
+	private static void handleCollision(Body planet)
 	{
-		for(Planet otherPlanet : planets)
+		for(Body otherPlanet : planets)
 		{
 			//We need to make sure we don't collide with oneself and don't collide with planets marked for delete (already collided with)
 			double diameter = (double) (2.0f*Math.sqrt(otherPlanet.mass));
@@ -142,7 +149,7 @@ public class PlanetHandler
 		}
 	}
 
-	private static void handleBounds(Planet p) {
+	private static void handleBounds(Body p) {
 		if(Main.bounded) {
 			if(p.position.x < Main.boundVec.x)
 			{
@@ -167,11 +174,10 @@ public class PlanetHandler
 			else {
 				return;
 			}
-			//p.vel = Constants.ZERO_VECTOR;
 		}
 	}
 
-	public static void makeOrbitAround(Planet center, Planet orbiter)
+	public static void makeOrbitAround(Body center, Body orbiter)
 	{
 		Vector2 distanceVector = Vector2Math.subtract(orbiter.position, center.position);
 		double dist = Vector2Math.magnitude(distanceVector);
@@ -188,11 +194,11 @@ public class PlanetHandler
 		Vector2 newVelocityVector = Vector2Math.mult(constructVector, velocityMag);
 
 		orbiter.vel = newVelocityVector;
-	}
+}
 
 	public static double getFrameTotalEnergy() {
 		double total = 0f;
-		for(Planet p : PlanetHandler.planets) {
+		for(Body p : BodyHandler.planets) {
 			total += 0.5 * p.mass * (p.vel.x*p.vel.x+p.vel.y*p.vel.y);
 			double dist = Vector2Math.distance(p.position, Main.centerBlackHole.position);
 			if(dist == 0f) dist = 1f;
