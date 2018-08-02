@@ -41,10 +41,10 @@ public class Quadtree
 		{
 			bodies.add(p);
 			
-			if(ne.containsBody(p)) ne.putBody(p);
-			if(nw.containsBody(p)) nw.putBody(p);
-			if(se.containsBody(p)) se.putBody(p);
-			if(sw.containsBody(p)) sw.putBody(p);
+			if(ne != null && ne.containsBody(p)) ne.putBody(p);
+			if(nw != null && nw.containsBody(p)) nw.putBody(p);
+			if(se != null && se.containsBody(p)) se.putBody(p);
+			if(sw != null && sw.containsBody(p)) sw.putBody(p);
 
 			//Update the total mass and COM
 			totalMass += p.mass;
@@ -71,7 +71,7 @@ public class Quadtree
 			nw = new Quadtree(x, y, sideLength/2);
 			se = new Quadtree(x + sideLength/2, y + sideLength/2, sideLength/2);
 			sw = new Quadtree(x, y + sideLength/2, sideLength/2);
-
+			
 			bodies.add(p);
 			
 			for(Body _p : bodies)

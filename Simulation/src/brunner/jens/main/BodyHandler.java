@@ -11,30 +11,34 @@ public class BodyHandler
 {
 	public static CopyOnWriteArrayList<Body> planets = new CopyOnWriteArrayList<Body>(); 
 
-	public static void createRandomPlanets(int amount)
+	public static ArrayList<Body> createRandomBodies(int amount, Vector2 center, double radius)
 	{
+		ArrayList<Body> newbodies = new ArrayList<Body>();
 		for(int i = 0; i < amount; i++)
 		{
-			planets.add(new Body());
+			Body b = new Body(center, radius);
+			planets.add(b);
+			newbodies.add(b);
 		}
+		return newbodies;
 	}
 
 	public static void updatePlanets(long frameTime)
 	{
 		BarnesHut.insertBodies();
-		
+
 		//We use a counting iterator because it's easier to solve the problem where we calculate the force per pair twice instead of just once necessary. 
 		for(int i = 0; i < planets.size(); i++)
 		{
 			Body planet = planets.get(i);
-			
+
 			//If this planet is marked for deletion, don't do anything with it.
 			if(planet.delete) continue;
 
 			//Don't affect fixed planets.
 			if(planet.fixed) continue;
 
-			//computeForce(planet, i, frameTime);
+			//computeForce(planet, i);
 
 			BarnesHut.doPhysics(planet, BarnesHut.root);
 
@@ -45,11 +49,11 @@ public class BodyHandler
 			Vector2 accel = new Vector2((planet.force.x/planet.mass), (planet.force.y/planet.mass));
 
 			Vector2 finalv = Vector2Math.mult(accel, frameTime * Main.timeScale);
-			
+
 			//Since we want to model reality, use the AVERAGE velocity during the frame, that is the area of a triangle in a v-t graph.
 			planet.lastv = Vector2Math.mult(finalv, 0.5);
 			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
-			
+
 			//net force PER FRAME, so reset it.
 			planet.force = Constants.ZERO_VECTOR;
 		}
@@ -60,10 +64,10 @@ public class BodyHandler
 		{
 			Vector2 moveV = Vector2Math.add(planet.vel, planet.lastv);
 			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(moveV, Main.timeScale*frameTime));
-			
+
 			//Add the last half the finalv to finish the frame with the correct end-velocity.
 			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
-			
+
 			//If we don't handle the bounds/adjust the positions after having calculated the positions from the velocity, they'll all be one frame behind the border, which is terrible looking.
 			if(Main.bounded) handleBounds(planet);
 		}
@@ -85,17 +89,17 @@ public class BodyHandler
 			//Also here, if we are deleting the planet, don't interact with it.
 			if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
 			{
+				
 				//First we get the x,y and magnitudal distance between the two bodies.
 				Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
 				double dist = Vector2Math.magnitude(distanceVector);
 
-
-				//This is a virtual limit for how close the bodies can get. It doesn't actually limit the proximity to another body on screen.
-				if(dist < 1f) dist = 1f;
-
-				//Now we compute first the total and then the component forces
 				//Depending on choice, use r or r^2 - this will be TODO later
 				Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+
+				if(dist < Main.smoothingParam) {
+					forceVector = Constants.ZERO_VECTOR;
+				}
 
 				planet.force = Vector2Math.add(planet.force, forceVector);
 				otherPlanet.force = Vector2Math.subtract(otherPlanet.force, forceVector);
@@ -108,9 +112,13 @@ public class BodyHandler
 		if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
 		{
 			Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
-			double dist = Vector2Math.magnitude(distanceVector) + Main.smoothingParam;
+			double dist = Vector2Math.magnitude(distanceVector);
 
 			Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+
+			if(dist < Main.smoothingParam) {
+				forceVector = Constants.ZERO_VECTOR;
+			}
 
 			planet.force = Vector2Math.add(planet.force, forceVector);
 		}
@@ -120,10 +128,7 @@ public class BodyHandler
 	{
 		for(Body otherPlanet : planets)
 		{
-			//We need to make sure we don't collide with oneself and don't collide with planets marked for delete (already collided with)
-			double diameter = (double) (2.0f*Math.sqrt(otherPlanet.mass));
-			//if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < diameter/2) 
-			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < 2f) 
+			if(otherPlanet != planet && !otherPlanet.delete && Vector2Math.distance(planet.position, otherPlanet.position) < 2)
 			{
 				//Collision detected. Now we compute post-collision forces. We want to absorb the smaller into the heavier planet, otherwise it looks really wonky.
 				if(planet.mass == otherPlanet.mass)
@@ -194,11 +199,23 @@ public class BodyHandler
 		Vector2 newVelocityVector = Vector2Math.mult(constructVector, velocityMag);
 
 		orbiter.vel = newVelocityVector;
-}
+	}
 
-	public static double getFrameTotalEnergy() {
+	public static void createGalaxy(Vector2 center, int amount, double radius)
+	{
+		ArrayList<Body> created = BodyHandler.createRandomBodies(amount, center, radius);
+		Body galaxyCenter = new Body(center, Constants.ZERO_VECTOR, amount*10);
+		for(Body b : created) {
+			BodyHandler.makeOrbitAround(galaxyCenter, b);
+		}
+		BodyHandler.planets.add(galaxyCenter);
+	}
+
+	public static double getFrameTotalEnergy()
+	{
 		double total = 0f;
-		for(Body p : BodyHandler.planets) {
+		for(Body p : BodyHandler.planets)
+		{
 			total += 0.5 * p.mass * (p.vel.x*p.vel.x+p.vel.y*p.vel.y);
 			double dist = Vector2Math.distance(p.position, Main.centerBlackHole.position);
 			if(dist == 0f) dist = 1f;

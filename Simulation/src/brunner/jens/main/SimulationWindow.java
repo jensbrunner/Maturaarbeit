@@ -155,6 +155,23 @@ public class SimulationWindow extends JFrame
 
 		});
 		
+		JButton zoomReset = new JButton();
+		zoomReset.setBounds(Constants.WINDOW_DIMENSION.width/2-200+5, 1080-15-10, 50, 15);
+		zoomReset.setText("1x");
+		zoomReset.setFocusable(false);
+		zoomReset.setBorderPainted(false);
+		zoomReset.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Main.scaleFactor = 1;
+				SimulationWindow.zoom.setFloatValue(1);
+				double rounded = Math.floor(10000 * (double)Main.scaleFactor + 0.5) / 10000;
+				SimulationWindow.zoomLabel.setText("Zoom: " + rounded+"x");
+			}
+		});
+		
 		time = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 1000, 10000, true);
 		timeLabel.setText("Time: " + String.valueOf(Main.timeScale) + "x");
 		timeLabel.setBounds(Constants.WINDOW_DIMENSION.width/2+260, 1080-40-10, 200, 10);
@@ -169,6 +186,23 @@ public class SimulationWindow extends JFrame
 				double rounded = Math.floor(10000 * (double)Main.timeScale + 0.5) / 10000;
 				timeLabel.setText("Time: " + rounded + "x");
 				System.out.println("Change time to: " + Main.timeScale + "x");
+			}
+		});
+		
+		JButton timeReset = new JButton();
+		timeReset.setBounds(Constants.WINDOW_DIMENSION.width/2+200+200+5, 1080-15-10, 50, 15);
+		timeReset.setText("1x");
+		timeReset.setFocusable(false);
+		timeReset.setBorderPainted(false);
+		timeReset.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Main.timeScale = 1;
+				SimulationWindow.time.setFloatValue(1);
+				double rounded = Math.floor(10000 * (double)Main.timeScale + 0.5) / 10000;
+				SimulationWindow.timeLabel.setText("Time: " + rounded+"x");
 			}
 		});
 		
@@ -192,6 +226,8 @@ public class SimulationWindow extends JFrame
 		add(zoomLabel);
 		add(time);
 		add(timeLabel);
+		add(zoomReset);
+		add(timeReset);
 		
 		add(timePassed);
 		add(fpsCounter);

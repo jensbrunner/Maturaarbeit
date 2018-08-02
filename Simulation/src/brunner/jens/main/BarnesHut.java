@@ -38,7 +38,7 @@ public class BarnesHut
 		//This is the root node. Position it according to the values found prior. Add a buffer of 1 distance unit.
 		//BarnesHut.root = new Quadtree(xmin-1, ymin-1, max+1);
 		//Anything outside this tree will not be interacted WITH. But can still be interacted UPON by other nodes.
-		BarnesHut.root = new Quadtree(-10000+Constants.WINDOW_DIMENSION.width/2, -10000+Constants.WINDOW_DIMENSION.height/2, 20000);
+		BarnesHut.root = new Quadtree(-20000+Constants.SCREEN_CENTER.x, -20000+Constants.SCREEN_CENTER.y, 40000);
 		
 		for(Body p : BodyHandler.planets)
 		{
@@ -56,9 +56,9 @@ public class BarnesHut
 		{
 			BodyHandler.computeForceBarnes(p, tree.bodies.get(0));
 			
-		}else if(tree.bodies.size() > 1 && tree.sideLength / Vector2Math.distance(p.position, new Vector2(tree.centerOfMass.x, tree.centerOfMass.y)) < 1)
+		}else if(tree.bodies.size() > 1 && tree.sideLength / Vector2Math.distance(p.position, new Vector2(tree.centerOfMass.x, tree.centerOfMass.y)) < Constants.MAC)
 		{
-			Body pseudoPlanet = new Body(tree.centerOfMass.x, tree.centerOfMass.y, 0f, 0f, tree.totalMass);
+			Body pseudoPlanet = new Body(tree.centerOfMass, Constants.ZERO_VECTOR, tree.totalMass);
 			BodyHandler.computeForceBarnes(p, pseudoPlanet);
 			
 		}else

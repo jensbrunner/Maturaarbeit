@@ -11,7 +11,7 @@ public class MouseMotionListener implements java.awt.event.MouseMotionListener {
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if(Main.isBounding) {
+		if(Main.isBounding && !Main.creatingGalaxy) {
 
 			Vector2 vec = new Vector2(e.getX(), e.getY());
 

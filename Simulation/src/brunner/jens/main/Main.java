@@ -1,16 +1,19 @@
 package brunner.jens.main;
 
+import brunner.jens.utils.Constants;
 import brunner.jens.utils.Vector2;
 
 public class Main
 {
 
-	public static boolean close, reset, showVelocityArrows, collisions, quadTree;
+	public static boolean close, reset, showVelocityArrows, collisions, quadTree, creatingGalaxy;
 	public static int iterations, lastIterations, planetAmount = 2000, blackHoleMass = 10000;
 	public static double scaleFactor = 1, timeScale = 1, timeCounter = 0;
 	public static long lastTime;
 	
-	public static  double smoothingParam = 8;
+	public static int initalSpreadRadius = 3000;
+	
+	public static  double smoothingParam = 20;
 	
 	public static boolean bounded, isBounding, boundingAcceptable;
 	public static Vector2 boundVec, boundVec2;
@@ -18,10 +21,11 @@ public class Main
 	//This is controlled by the "blackHoleCheck" CheckBox in the GUI (see SimulationWindow.java)
 	public static Body centerBlackHole = null;
 	
+	static long starttime = System.currentTimeMillis();
 	public static void main(String[] args)
 	{
 		SimulationWindow simWind = new SimulationWindow();
-		BodyHandler.createRandomPlanets(planetAmount);
+		BodyHandler.createRandomBodies(planetAmount, Constants.SCREEN_CENTER, Main.initalSpreadRadius);
 		if(centerBlackHole != null) BodyHandler.planets.add(centerBlackHole);
 		
 		long currentTime = System.currentTimeMillis();
@@ -34,22 +38,39 @@ public class Main
 			double rounded = Math.floor(10000 * (double)timeCounter + 0.5) / 10000;
 			SimulationWindow.timePassed.setText(rounded + " sec");
 			//System.out.println(frameTime);
+			currentTime = newTime;
 			if(currentTime - lastTime > 1000)
 			{
 				showFPS(currentTime - lastTime);
 				lastIterations = iterations;
 				lastTime = currentTime;
 			}
-			currentTime = newTime;
+
+			
+			/*//---------------DEBUG-------------
+			if(currentTime - starttime > 5000) {
+				System.out.println("Körper: " + Main.planetAmount);
+				System.out.println("Verteilungsraum: " + Main.initalSpreadRadius);
+				System.out.println("MAC: " + Constants.MAC);
+				System.out.println("Frames: " + iterations);
+				System.out.println("Zeit: " + (currentTime-starttime));
+				System.out.println("----------------------");
+				Main.planetAmount+=1000;
+				starttime = System.currentTimeMillis();
+				Main.reset = true;
+			}
+			//---------------DEBUG-------------*/
+			
+			
 			
 			if(reset)
 			{
 				BodyHandler.planets.clear();
-				BodyHandler.createRandomPlanets(planetAmount);
+				BodyHandler.createRandomBodies(planetAmount, Constants.SCREEN_CENTER, Main.initalSpreadRadius);
 				if(centerBlackHole != null)
 				{
 					BodyHandler.planets.remove(centerBlackHole);
-					centerBlackHole = new Body(1920/2f, 1080/2f, 0f, 0f, Main.blackHoleMass);
+					centerBlackHole = new Body(Constants.SCREEN_CENTER, Constants.ZERO_VECTOR, Main.blackHoleMass);
 					centerBlackHole.fixed = true;
 					BodyHandler.planets.add(centerBlackHole);
 				}
@@ -79,11 +100,6 @@ public class Main
 			SimulationWindow.fpsCounter.setText("FPS: ERROR"); 
 			return;
 		}
-		/*if(fpsCount > 100000) 
-		{
-			SimulationWindow.fpsCounter.setText("FPS: MAX");
-			return;
-		}*/
 		SimulationWindow.fpsCounter.setText("FPS: " + Math.floor(100 * (double)fpsCount + 0.5) / 100);
 	}
 }
