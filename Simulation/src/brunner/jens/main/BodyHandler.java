@@ -23,9 +23,9 @@ public class BodyHandler
 		return newbodies;
 	}
 
-	public static void updatePlanets(long frameTime)
+	public static void updateBodies(long frameTime)
 	{
-		BarnesHut.insertBodies();
+		if(Main.barneshut) BarnesHut.insertBodies();
 
 		//We use a counting iterator because it's easier to solve the problem where we calculate the force per pair twice instead of just once necessary. 
 		for(int i = 0; i < planets.size(); i++)
@@ -38,9 +38,9 @@ public class BodyHandler
 			//Don't affect fixed planets.
 			if(planet.fixed) continue;
 
-			//computeForce(planet, i);
+			if(!Main.barneshut) computeForce(planet, i);
 
-			BarnesHut.doPhysics(planet, BarnesHut.root);
+			if(Main.barneshut) BarnesHut.doPhysics(planet, BarnesHut.root);
 
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
 			if(Main.collisions) handleCollision(planet);
@@ -68,7 +68,7 @@ public class BodyHandler
 			//Add the last half the finalv to finish the frame with the correct end-velocity.
 			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
 
-			//If we don't handle the bounds/adjust the positions after having calculated the positions from the velocity, they'll all be one frame behind the border, which is terrible looking.
+			//If we don't handle the bounds/adjust the positions after having calculated the positions from the velocity, they'll all be frametime * velocity beyond the border, which looks terribly glitchy.
 			if(Main.bounded) handleBounds(planet);
 		}
 
@@ -91,11 +91,12 @@ public class BodyHandler
 			{
 				
 				//First we get the x,y and magnitudal distance between the two bodies.
-				Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
-				double dist = Vector2Math.magnitude(distanceVector);
+				Vector2 distVec = Vector2Math.subtract(otherPlanet.position, planet.position);
+				double dist = Vector2Math.magnitude(distVec);
 
 				//Depending on choice, use r or r^2 - this will be TODO later
-				Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+				//Vector2 forceVector = Vector2Math.mult(distVec, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+				Vector2 forceVector = Vector2Math.mult(Vector2Math.mult(distVec, 1/dist), Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist)));
 
 				if(dist < Main.smoothingParam) {
 					forceVector = Constants.ZERO_VECTOR;
@@ -111,10 +112,11 @@ public class BodyHandler
 	{
 		if((planet.position.x != otherPlanet.position.x && planet.position.y != otherPlanet.position.y) && !otherPlanet.delete)
 		{
-			Vector2 distanceVector = Vector2Math.subtract(otherPlanet.position, planet.position);
-			double dist = Vector2Math.magnitude(distanceVector);
+			Vector2 distVec = Vector2Math.subtract(otherPlanet.position, planet.position);
+			double dist = Vector2Math.magnitude(distVec);
 
-			Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+			//Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+			Vector2 forceVector = Vector2Math.mult(Vector2Math.mult(distVec, 1/dist), Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist)));
 
 			if(dist < Main.smoothingParam) {
 				forceVector = Constants.ZERO_VECTOR;

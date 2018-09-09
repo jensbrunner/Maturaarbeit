@@ -41,23 +41,23 @@ public class Quadtree
 		{
 			bodies.add(p);
 			
-			if(ne != null && ne.containsBody(p)) ne.putBody(p);
-			if(nw != null && nw.containsBody(p)) nw.putBody(p);
-			if(se != null && se.containsBody(p)) se.putBody(p);
-			if(sw != null && sw.containsBody(p)) sw.putBody(p);
-
 			//Update the total mass and COM
 			totalMass += p.mass;
-
-			double x = 0f;
-			double y = 0f;
+			double com_x = 0f;
+			double com_y = 0f;
 			for(Body _p : bodies)
 			{
-				x += _p.position.x * _p.mass;
-				y += _p.position.y * _p.mass;
+				com_x += _p.position.x * _p.mass;
+				com_y += _p.position.y * _p.mass;
 			}
-			centerOfMass = new Vector2(x/totalMass, y/totalMass);
-		
+			centerOfMass = new Vector2(com_x/totalMass, com_y/totalMass);
+			
+			//Recursively insert
+			if(ne.containsBody(p)) ne.putBody(p);
+			if(nw.containsBody(p)) nw.putBody(p);
+			if(se.containsBody(p)) se.putBody(p);
+			if(sw.containsBody(p)) sw.putBody(p);
+
 		}else if(bodies.size() == 0)
 		{
 			bodies.add(p);
@@ -66,43 +66,32 @@ public class Quadtree
 		}else if(bodies.size() == 1)
 		{
 			//BarnesHut.numNodes += 4;
+			bodies.add(p);
+			totalMass += p.mass;
 			
+			double com_x = 0f;
+			double com_y = 0f;
+			for(Body _p : bodies)
+			{
+				com_x += _p.position.x * _p.mass;
+				com_y += _p.position.y * _p.mass;
+			}
+			centerOfMass = new Vector2(com_x/totalMass, com_y/totalMass);
+			
+			//Create all 4 Subnodes
 			ne = new Quadtree(x + sideLength/2, y, sideLength/2);
 			nw = new Quadtree(x, y, sideLength/2);
 			se = new Quadtree(x + sideLength/2, y + sideLength/2, sideLength/2);
 			sw = new Quadtree(x, y + sideLength/2, sideLength/2);
 			
-			bodies.add(p);
-			
+			//Recursively insert.
 			for(Body _p : bodies)
 			{
-				if(ne.containsBody(_p))
-				{
-					ne.putBody(_p);
-				}
-				if(nw.containsBody(_p))
-				{
-					nw.putBody(_p);
-				}
-				if(se.containsBody(_p))
-				{
-					se.putBody(_p);
-				}
-				if(sw.containsBody(_p))
-				{
-					sw.putBody(_p);
-				}
+				if(ne.containsBody(_p)) ne.putBody(_p);
+				if(nw.containsBody(_p)) nw.putBody(_p);
+				if(se.containsBody(_p)) se.putBody(_p);
+				if(sw.containsBody(_p)) sw.putBody(_p);
 			}
-			totalMass += p.mass;
-
-			double x = 0f;
-			double y = 0f;
-			for(Body _p : bodies)
-			{
-				x += _p.position.x * _p.mass;
-				y += _p.position.y * _p.mass;
-			}
-			centerOfMass = new Vector2(x/totalMass, y/totalMass);
 		}
 	}
 }
