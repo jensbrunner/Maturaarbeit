@@ -44,9 +44,9 @@ public class SimulationWindow extends JFrame
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		//Init optionWindow in here as it is "part" of the SimulationWindow and should thus be controlled by it.
 		optionWindow = new OptionWindow();
 
-		
 		JButton closeButton = new JButton();
 		closeButton.setBounds(1920-70, 0, 70, 20);
 		closeButton.setText("Close");
@@ -122,8 +122,8 @@ public class SimulationWindow extends JFrame
 		});
 		
 		JButton optionsButton = new JButton();
-		optionsButton.setBounds(1920-80, 1080-20, 80, 20);
-		optionsButton.setText("Options");
+		optionsButton.setBounds(1920-138, 1080-20, 138, 20);
+		optionsButton.setText("Advanced Options");
 		optionsButton.setFocusable(false);
 		optionsButton.setBorderPainted(false);
 		optionsButton.addActionListener(new ActionListener()
@@ -134,7 +134,6 @@ public class SimulationWindow extends JFrame
 				optionWindow.setVisible(!optionWindow.isVisible());
 			}
 		});
-		
 		
 		
 		zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 10000, true);

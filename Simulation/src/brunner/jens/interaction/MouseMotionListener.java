@@ -2,8 +2,12 @@ package brunner.jens.interaction;
 
 import java.awt.event.MouseEvent;
 
+import brunner.jens.editor.EditorHandler;
+import brunner.jens.main.Body;
+import brunner.jens.main.BodyHandler;
 import brunner.jens.main.Main;
 import brunner.jens.utils.Constants;
+import brunner.jens.utils.Toolbox;
 import brunner.jens.utils.Vector2;
 import brunner.jens.utils.Vector2Math;
 
@@ -11,20 +15,18 @@ public class MouseMotionListener implements java.awt.event.MouseMotionListener {
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if(Main.isBounding && !Main.creatingGalaxy) {
-
-			Vector2 vec = new Vector2(e.getX(), e.getY());
-
-			Vector2 diff = new Vector2(Constants.WINDOW_DIMENSION.width/2, Constants.WINDOW_DIMENSION.height/2);
-			Vector2 scaled = Vector2Math.mult(Vector2Math.subtract(vec,diff), 1./Main.scaleFactor);
-			Vector2 drawPos = Vector2Math.add(scaled, diff);
-
+		
+		Vector2 drawPos = Toolbox.translateToScreen(new Vector2(e.getX(),e.getY()), true);
+		
+		if(Main.isBounding && !Main.creatingGalaxy && !Main.inEditor) {
 			if(drawPos.x > Main.boundVec.x && drawPos.y > Main.boundVec.y) {
 				Main.boundVec2 = new Vector2(drawPos.x, drawPos.y);
 				Main.boundingAcceptable = true;
 			}else {
 				Main.boundingAcceptable = false;
 			}
+		}else if(Main.inEditor && EditorHandler.drag) {
+			BodyHandler.planets.add(new Body(drawPos, Constants.ZERO_VECTOR, EditorHandler.setMass));
 		}
 
 	}

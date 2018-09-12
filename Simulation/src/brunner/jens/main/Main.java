@@ -1,5 +1,7 @@
 package brunner.jens.main;
 
+import brunner.jens.editor.EditorHandler;
+import brunner.jens.editor.EditorWindow;
 import brunner.jens.utils.Constants;
 import brunner.jens.utils.Toolbox;
 import brunner.jens.utils.Vector2;
@@ -8,11 +10,11 @@ public class Main
 {
 
 	//Booleans that control much of sim functionality, alongside some values pertaining to those functionalities.
-	public static boolean close, reset, showVelocityArrows, collisions, quadTree, creatingGalaxy, barneshut = true, frameTest = false;
+	public static boolean close = false, reset = false, showVelocityArrows = false, collisions = false, quadTree = false, creatingGalaxy = false, barneshut = true, frameTest = false, pause = false, inEditor = false;
 	public static int iterations, lastIterations, planetAmount = 2000, blackHoleMass = 10000;
 	public static double scaleFactor = 1, timeScale = 1, timeCounter = 0;
 	public static int initalSpreadRadius = 1000;
-	public static  double smoothingParam = 20;
+	public static  double smoothingParam = 5;
 	public static boolean bounded, isBounding, boundingAcceptable;
 	public static Vector2 boundVec, boundVec2;
 	
@@ -25,7 +27,10 @@ public class Main
 	
 	public static void main(String[] args)
 	{
+		//Init SimualtionWindow and EditorWindow
 		SimulationWindow simWind = new SimulationWindow();
+		EditorHandler.editorWindow = new EditorWindow();
+		
 		BodyHandler.createRandomBodies(planetAmount, Constants.SCREEN_CENTER, Main.initalSpreadRadius);
 		if(centerBlackHole != null) BodyHandler.planets.add(centerBlackHole);
 		
@@ -51,14 +56,14 @@ public class Main
 			}
 
 			//if(frameTest) Main.debug(currentTime);
-
+			
 			if(reset)
 			{
 				Main.reset();
 			}
-			
-			//Update simulation with frameTime as parameter.
-			BodyHandler.updateBodies(frameTime);
+				
+			//Update simulation with frameTime as parameter if the game is not paused.
+			if(!pause) BodyHandler.updateBodies(frameTime);
 		
 			//Render
 			simWind.repaint();

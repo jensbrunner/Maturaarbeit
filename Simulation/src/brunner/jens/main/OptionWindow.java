@@ -3,24 +3,27 @@ package brunner.jens.main;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import brunner.jens.editor.EditorHandler;
+import brunner.jens.editor.EditorWindow;
 import brunner.jens.utils.Constants;
 
+
 public class OptionWindow extends JFrame{
+	
 	public OptionWindow() {
-		super("Options");
-		//setUndecorated(true);
+		super("Advanced Options");
 		setSize(300, 500);
 		setLocation(1920-300, 1080/2-250);
 		setResizable(false);
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setLayout(null);
+		setVisible(false);
 		
 		JCheckBox blackHoleCheck = new JCheckBox();
 		blackHoleCheck.setText("Center Black Hole");
@@ -148,10 +151,33 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		JLabel spreadLabel = new JLabel();
+		spreadLabel.setText("Radius of spread:");
+		spreadLabel.setBounds(0, 0+120, 100, 20);
+		
+		JTextField spreadField = new JTextField();
+		spreadField.setText(String.valueOf(Main.initalSpreadRadius));
+		spreadField.setBounds(0+105, 0+120, 40, 20);
+		spreadField.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				try
+				{
+					Main.initalSpreadRadius = Integer.parseInt(spreadField.getText());
+					Main.reset = true;
+				} catch(NumberFormatException e) {
+					System.out.println("Entry is not an integer.");
+					smoothingField.setText("NaN");
+				}
+			}
+		});
+		
 		JCheckBox newgalaxyCheck = new JCheckBox();
 		newgalaxyCheck.setText("New Galaxy");
 		newgalaxyCheck.setFocusable(false);
-		newgalaxyCheck.setBounds(0, 0+120, 100, 20);
+		newgalaxyCheck.setBounds(0, 0+140, 100, 20);
 		newgalaxyCheck.addActionListener(new ActionListener()
 		{
 			@Override
@@ -165,6 +191,23 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		JCheckBox editorCheck = new JCheckBox();
+		editorCheck.setText("Editor");
+		editorCheck.setFocusable(false);
+		editorCheck.setBounds(0, 0+160, 100, 20);
+		editorCheck.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(editorCheck.isSelected()) {
+					EditorHandler.enterEditor();
+				}else {
+					EditorHandler.exitEditor();
+				}
+				
+			}
+		});
+		
 		add(blackHoleCheck);
 		add(showVelocityCheck);
 		add(quadTreeCheck);
@@ -173,5 +216,8 @@ public class OptionWindow extends JFrame{
 		add(smoothingField);
 		add(smoothingLabel);
 		add(newgalaxyCheck);
+		add(spreadLabel);
+		add(spreadField);
+		add(editorCheck);
 	}
 }

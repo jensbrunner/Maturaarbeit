@@ -32,15 +32,16 @@ public class BodyHandler
 		{
 			Body planet = planets.get(i);
 
-			//If this planet is marked for deletion, don't do anything with it.
-			if(planet.delete) continue;
+			//If this planet is marked for deletion, don't do anything with it. || Don't affect fixed planets.
+			if(planet.delete || planet.fixed) continue;
 
-			//Don't affect fixed planets.
-			if(planet.fixed) continue;
-
-			if(!Main.barneshut) computeForce(planet, i);
-
-			if(Main.barneshut) BarnesHut.doPhysics(planet, BarnesHut.root);
+			if(Main.barneshut)
+			{
+				BarnesHut.doPhysics(planet, BarnesHut.root);
+			}else
+			{
+				computeForce(planet, i);
+			}
 
 			//Handle the planet's collision with other planets. Some will be marked with the delete boolean
 			if(Main.collisions) handleCollision(planet);
@@ -63,7 +64,7 @@ public class BodyHandler
 		for(Body planet : planets)
 		{
 			Vector2 moveV = Vector2Math.add(planet.vel, planet.lastv);
-			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(moveV, Main.timeScale*frameTime));
+			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(moveV, Main.timeScale*frameTime)); //Ommitting the division of frametime by 1000 is a choice of design, accelerating the speed by 1k.
 
 			//Add the last half the finalv to finish the frame with the correct end-velocity.
 			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
@@ -114,8 +115,7 @@ public class BodyHandler
 		{
 			Vector2 distVec = Vector2Math.subtract(otherPlanet.position, planet.position);
 			double dist = Vector2Math.magnitude(distVec);
-
-			//Vector2 forceVector = Vector2Math.mult(distanceVector, Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist*dist)));
+			
 			Vector2 forceVector = Vector2Math.mult(Vector2Math.mult(distVec, 1/dist), Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist)));
 
 			if(dist < Main.smoothingParam) {
