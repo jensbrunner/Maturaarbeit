@@ -14,7 +14,7 @@ public class EditorWindow extends JFrame{
 	public EditorWindow() {
 		super("Editor Options");
 		setUndecorated(true);
-		setSize(400, 50);
+		setSize(200, 20);
 		setLocation(1920/2-200, 0);
 		setResizable(false);
 		setAlwaysOnTop(true);
@@ -28,7 +28,7 @@ public class EditorWindow extends JFrame{
 		
 		JTextField massField = new JTextField();
 		massField.setText(String.valueOf(EditorHandler.setMass));
-		massField.setBounds(0+30, 20, 30, 20);
+		massField.setBounds(0+40, 0, 30, 20);
 		massField.addActionListener(new ActionListener()
 		{
 			@Override
