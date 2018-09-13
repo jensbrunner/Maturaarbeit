@@ -10,9 +10,10 @@ public class Main
 {
 
 	//Booleans that control much of sim functionality, alongside some values pertaining to those functionalities.
-	public static boolean close = false, reset = false, showVelocityArrows = false, collisions = false, quadTree = false, creatingGalaxy = false, barneshut = true, frameTest = false, pause = false, inEditor = false;
-	public static int iterations, lastIterations, planetAmount = 2000, blackHoleMass = 10000;
-	public static double scaleFactor = 1, timeScale = 1, timeCounter = 0;
+	public static boolean close = false, reset = false, showVelocityArrows = false, collisions = false, quadTree = false, creatingGalaxy = false, 
+						  barneshut = true, frameTest = false, pause = false, randomVelocity = true, initOrbit, randomMass = false;
+	public static int iterations, lastIterations, initPlanetAmount = 2000, curBodyAmount = 0, blackHoleMass = 10000 ;
+	public static double scaleFactor = 1, timeScale = 1, timeCounter = 0, maxInitVel = 0.1, maxRandomMass = 10;
 	public static int initalSpreadRadius = 1000;
 	public static  double smoothingParam = 5;
 	public static boolean bounded, isBounding, boundingAcceptable;
@@ -24,15 +25,14 @@ public class Main
 	//Timestamp variables necessary to keep track of elapsed time for the gameloop and other features.
 	static long startTime = System.currentTimeMillis();
 	
-	
 	public static void main(String[] args)
 	{
 		//Init SimualtionWindow and EditorWindow
-		SimulationWindow simWind = new SimulationWindow();
+		SimulationWindow.simWind = new SimulationWindow();
 		EditorHandler.editorWindow = new EditorWindow();
 		
-		BodyHandler.createRandomBodies(planetAmount, Constants.SCREEN_CENTER, Main.initalSpreadRadius);
-		if(centerBlackHole != null) BodyHandler.planets.add(centerBlackHole);
+		//We call this function to set everything up for the beginning.
+		Main.reset();
 		
 		//We have to initialise the variable outside of the loop.
 		long currentTime = System.currentTimeMillis();
@@ -43,7 +43,7 @@ public class Main
 		{
 			long newTime = System.currentTimeMillis();
 			long frameTime = newTime-currentTime;
-			timeCounter += frameTime/1000d * Main.timeScale;
+			if(!pause) timeCounter += frameTime/1000d * Main.timeScale;
 			SimulationWindow.timePassed.setText(Toolbox.approxRound(timeCounter, 3) + " sec");
 			currentTime = newTime;
 			
@@ -55,18 +55,17 @@ public class Main
 				lastFPSTime = currentTime;
 			}
 
+			//System.out.println(Toolbox.getTotalEnergy());
+			
 			//if(frameTest) Main.debug(currentTime);
 			
-			if(reset)
-			{
-				Main.reset();
-			}
+			if(reset) Main.reset();
 				
 			//Update simulation with frameTime as parameter if the game is not paused.
 			if(!pause) BodyHandler.updateBodies(frameTime);
 		
 			//Render
-			simWind.repaint();
+			SimulationWindow.simWind.repaint();
 			
 			//This variable keeps track of the amount of frames since start.
 			iterations++;
@@ -76,13 +75,19 @@ public class Main
 	
 	private static void reset() {
 		BodyHandler.planets.clear();
-		BodyHandler.createRandomBodies(planetAmount, Constants.SCREEN_CENTER, Main.initalSpreadRadius);
+		SimulationWindow.updateBodyLabel(0);
+		BodyHandler.createRandomBodies(initPlanetAmount, Constants.SCREEN_CENTER, Main.initalSpreadRadius);
 		if(centerBlackHole != null)
 		{
 			BodyHandler.planets.remove(centerBlackHole);
 			centerBlackHole = new Body(Constants.SCREEN_CENTER, Constants.ZERO_VECTOR, Main.blackHoleMass);
 			centerBlackHole.fixed = true;
 			BodyHandler.planets.add(centerBlackHole);
+			if(Main.initOrbit) {
+				for(Body b : BodyHandler.planets) {
+					Toolbox.makeOrbitAround(centerBlackHole, b);
+				}
+			}
 		}
 		timeCounter = 0;
 		iterations = 0;
@@ -92,18 +97,18 @@ public class Main
 	private static void debug(long currentTime) {
 		if(currentTime - startTime > 5000) {
 			System.out.println("Modus: " + Main.barneshut);
-			System.out.println("Körper: " + Main.planetAmount);
+			System.out.println("Körper: " + Main.initPlanetAmount);
 			System.out.println("Verteilungsraum: " + Main.initalSpreadRadius);
 			System.out.println("MAC: " + Constants.MAC);
 			System.out.println("Frames: " + iterations);
 			System.out.println("Zeit: " + (currentTime-startTime));
 			System.out.println("----------------------");
-			Main.planetAmount+=1000;
-			if(Main.planetAmount > 10000) {
+			Main.initPlanetAmount+=1000;
+			if(Main.initPlanetAmount > 10000) {
 				if(Main.barneshut) {
 					System.exit(0);
 				barneshut = false;
-				planetAmount = 0;
+				initPlanetAmount = 0;
 				}else {
 					System.exit(0);
 				}
@@ -118,6 +123,10 @@ public class Main
 		if(fpsCount < 0)
 		{
 			SimulationWindow.fpsCounter.setText("FPS: ERROR"); 
+			return;
+		}
+		if(fpsCount > 500) {
+			SimulationWindow.fpsCounter.setText("FPS: MAX"); 
 			return;
 		}
 		SimulationWindow.fpsCounter.setText("FPS: " + Math.floor(100 * (double)fpsCount + 0.5) / 100);

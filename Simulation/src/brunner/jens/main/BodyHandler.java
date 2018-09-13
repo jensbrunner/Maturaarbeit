@@ -11,15 +11,19 @@ public class BodyHandler
 {
 	public static CopyOnWriteArrayList<Body> planets = new CopyOnWriteArrayList<Body>(); 
 
+	//Create an amount of random bodies within a certain radius of a given center.
 	public static ArrayList<Body> createRandomBodies(int amount, Vector2 center, double radius)
 	{
 		ArrayList<Body> newbodies = new ArrayList<Body>();
 		for(int i = 0; i < amount; i++)
 		{
-			Body b = new Body(center, radius);
+			Body b = new Body(center, radius, Main.randomVelocity, Main.randomMass);
 			planets.add(b);
 			newbodies.add(b);
 		}
+		//Update the planetamount label.
+		SimulationWindow.updateBodyLabel(Main.curBodyAmount + amount);
+		
 		return newbodies;
 	}
 
@@ -64,7 +68,7 @@ public class BodyHandler
 		for(Body planet : planets)
 		{
 			Vector2 moveV = Vector2Math.add(planet.vel, planet.lastv);
-			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(moveV, Main.timeScale*frameTime)); //Ommitting the division of frametime by 1000 is a choice of design, accelerating the speed by 1k.
+			planet.position = Vector2Math.add(planet.position, Vector2Math.mult(moveV, Main.timeScale*frameTime)); //Ommitting the division of frametime by 1000 is a choice of design, accelerating the speed thousandfold.
 
 			//Add the last half the finalv to finish the frame with the correct end-velocity.
 			planet.vel = Vector2Math.add(planet.vel, planet.lastv);
@@ -100,7 +104,8 @@ public class BodyHandler
 				Vector2 forceVector = Vector2Math.mult(Vector2Math.mult(distVec, 1/dist), Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist)));
 
 				if(dist < Main.smoothingParam) {
-					forceVector = Constants.ZERO_VECTOR;
+					//forceVector = Constants.ZERO_VECTOR;
+					dist = Main.smoothingParam;
 				}
 
 				planet.force = Vector2Math.add(planet.force, forceVector);
@@ -182,47 +187,5 @@ public class BodyHandler
 				return;
 			}
 		}
-	}
-
-	public static void makeOrbitAround(Body center, Body orbiter)
-	{
-		Vector2 distanceVector = Vector2Math.subtract(orbiter.position, center.position);
-		double dist = Vector2Math.magnitude(distanceVector);
-
-		//Use Fz(centripetal force) = Fg(gravitational force) and solve for the velocity
-		double velocityMag = Math.sqrt(Constants.GRAVITATIONAL_CONSTANT * center.mass * (1/dist));
-
-
-		double xDist = orbiter.position.x - center.position.x;
-		double yDist = orbiter.position.y - center.position.y;
-
-		//To create a perpendicular vector, switch components and one sign (+ -> - or - -> +).
-		Vector2 constructVector = Vector2Math.mult(new Vector2(-yDist, xDist), 1/dist);
-		Vector2 newVelocityVector = Vector2Math.mult(constructVector, velocityMag);
-
-		orbiter.vel = newVelocityVector;
-	}
-
-	public static void createGalaxy(Vector2 center, int amount, double radius)
-	{
-		ArrayList<Body> created = BodyHandler.createRandomBodies(amount, center, radius);
-		Body galaxyCenter = new Body(center, Constants.ZERO_VECTOR, amount*10);
-		for(Body b : created) {
-			BodyHandler.makeOrbitAround(galaxyCenter, b);
-		}
-		BodyHandler.planets.add(galaxyCenter);
-	}
-
-	public static double getFrameTotalEnergy()
-	{
-		double total = 0f;
-		for(Body p : BodyHandler.planets)
-		{
-			total += 0.5 * p.mass * (p.vel.x*p.vel.x+p.vel.y*p.vel.y);
-			double dist = Vector2Math.distance(p.position, Main.centerBlackHole.position);
-			if(dist == 0f) dist = 1f;
-			total += (Constants.GRAVITATIONAL_CONSTANT * p.mass * Main.centerBlackHole.mass)/dist;
-		}
-		return total;
 	}
 }

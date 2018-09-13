@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 
 import javax.swing.JComponent;
 
+import brunner.jens.editor.EditorHandler;
 import brunner.jens.utils.Constants;
 import brunner.jens.utils.Toolbox;
 import brunner.jens.utils.Vector2;
@@ -55,11 +57,16 @@ public class DrawingComponent extends JComponent
 			g2.setColor(Color.WHITE);
 			DrawingComponent.paintTree(BarnesHut.paintTree);
 		}
+		
+		//If currently drawing velocity in the editor, display that.
+		if(EditorHandler.drawingVelocity) {
+		DrawingComponent.paintDrawingVelocity();
+		}
 	}
 	
 	public static void paintBody(Vector2 position, Vector2 vel)
 	{
-		
+		g2.setColor(Color.WHITE);
 		//Based on the zoom level, scale the bodies accordingly.
 		double radius = Main.scaleFactor*4/2;
 		if(radius < 1) radius = 1;
@@ -71,8 +78,10 @@ public class DrawingComponent extends JComponent
 		g2.drawLine((int)position.x, (int)position.y, (int)(position.x+vel.x*20), (int)(position.y+vel.y*20));
 		}
 	}
+	
 	public static void paintTree(Quadtree tree)
 	{
+		g2.setColor(Color.WHITE);
 		//If the tree is constructed.
 		if(BarnesHut.root == null) return;
 		
@@ -85,5 +94,11 @@ public class DrawingComponent extends JComponent
 		if(tree.nw != null) paintTree(tree.nw);
 		if(tree.se != null) paintTree(tree.sw);
 		if(tree.sw != null) paintTree(tree.se);
+	}
+	
+	public static void paintDrawingVelocity() {
+		g2.setColor(Color.WHITE);
+		Vector2 pointerLocation = new Vector2(MouseInfo.getPointerInfo().getLocation().getX(), MouseInfo.getPointerInfo().getLocation().getY());
+		g2.drawLine((int)Toolbox.translateToScreen(EditorHandler.createdBody.position, false).x, (int)Toolbox.translateToScreen(EditorHandler.createdBody.position, false).y, (int)pointerLocation.x, (int)pointerLocation.y);
 	}
 }

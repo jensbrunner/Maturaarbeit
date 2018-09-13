@@ -16,16 +16,22 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
+import brunner.jens.interaction.KeyListener;
 import brunner.jens.interaction.MouseListener;
 import brunner.jens.interaction.MouseMotionListener;
 import brunner.jens.interaction.MouseWheelListener;
 import brunner.jens.utils.Constants;
 import brunner.jens.utils.FloatSlider;
+import brunner.jens.utils.Toolbox;
 
 public class SimulationWindow extends JFrame 
 {
+	
+	public static SimulationWindow simWind;
+	
 	public static JLabel timePassed = new JLabel();
 	public static JLabel fpsCounter = new JLabel();
+	public static JLabel curBodyLabel = new JLabel();
 	public static JLabel zoomLabel = new JLabel();
 	public static FloatSlider zoom;
 	public static JLabel timeLabel = new JLabel();
@@ -62,18 +68,18 @@ public class SimulationWindow extends JFrame
 		});
 		
 		JTextField bodyAmount = new JTextField();
-		bodyAmount.setText(String.valueOf(Main.planetAmount));
+		bodyAmount.setText(String.valueOf(Main.initPlanetAmount));
 		bodyAmount.setBounds(1920-70-70-70-100, 0, 100, 20);
 		bodyAmount.addActionListener(new ActionListener()
 		{
-
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
 				try
 				{
-					Main.planetAmount = Integer.parseInt(bodyAmount.getText());
+					Main.initPlanetAmount = Integer.parseInt(bodyAmount.getText());
 					Main.reset = true;
+					//requestFocus();
 				} catch(NumberFormatException e) {
 					System.out.println("Entry is not an integer.");
 					bodyAmount.setText("NaN");
@@ -116,7 +122,7 @@ public class SimulationWindow extends JFrame
 				for(Body p : BodyHandler.planets)
 				{
 					if(p == curMass) continue;
-					BodyHandler.makeOrbitAround(curMass, p);
+					Toolbox.makeOrbitAround(curMass, p);
 				}
 			}
 		});
@@ -141,6 +147,7 @@ public class SimulationWindow extends JFrame
 		zoomLabel.setBounds(Constants.WINDOW_DIMENSION.width/2-400+60, 1080-40-10, 200, 10);
 		zoomLabel.setFocusable(false);
 		zoom.setBounds(Constants.WINDOW_DIMENSION.width/2-400, 1080-15-10, 200, 15);
+		zoom.setBackground(Color.DARK_GRAY);
 		zoom.addAdjustmentListener(new AdjustmentListener()
 		{
 
@@ -176,6 +183,7 @@ public class SimulationWindow extends JFrame
 		timeLabel.setBounds(Constants.WINDOW_DIMENSION.width/2+260, 1080-40-10, 200, 10);
 		timeLabel.setFocusable(false);
 		time.setBounds(Constants.WINDOW_DIMENSION.width/2+200, 1080-15-10, 200, 15);
+		time.setBackground(Color.DARK_GRAY);
 		time.addAdjustmentListener(new AdjustmentListener()
 		{
 
@@ -214,8 +222,12 @@ public class SimulationWindow extends JFrame
 		fpsCounter.setForeground(Color.WHITE);
 		fpsCounter.setFocusable(false);
 		fpsCounter.setBounds(10+100, 0, 100, 50);
+		
+		curBodyLabel.setText("Bodies: ");
+		curBodyLabel.setForeground(Color.WHITE);
+		curBodyLabel.setFocusable(false);
+		curBodyLabel.setBounds(10+200, 0, 100, 50);
 
-		DrawingComponent draw = new DrawingComponent();
 		add(closeButton);
 		add(resetButton);
 		add(orbitButton);
@@ -230,13 +242,30 @@ public class SimulationWindow extends JFrame
 		
 		add(timePassed);
 		add(fpsCounter);
+		add(curBodyLabel);
 		
 		//Adding the listeners
 		addMouseListener(new MouseListener());
 		addMouseMotionListener(new MouseMotionListener());
 		addMouseWheelListener(new MouseWheelListener());
+		addKeyListener(new KeyListener());
 		
+		DrawingComponent draw = new DrawingComponent();
+		draw.setFocusable(false);
 		add(draw);
+		setFocusable(true);
 		setVisible(true);
+		
+		
+	}
+	
+	public static void updateBodyLabel(int amount) {
+		Main.curBodyAmount = amount;
+		curBodyLabel.setText("" + amount);
+	}
+	
+	//Since JTextField tends to stupidly retain focus,  we want to add a function that gives the focus back to the main SimulationWindow, such that keyboard inputs can be properly recorded.
+	public static void resetFocus() {
+		simWind.requestFocusInWindow();
 	}
 }

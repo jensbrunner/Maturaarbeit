@@ -25,6 +25,8 @@ public class OptionWindow extends JFrame{
 		setLayout(null);
 		setVisible(false);
 		
+		//-------------------------Black Hole------------------------------
+		
 		JCheckBox blackHoleCheck = new JCheckBox();
 		blackHoleCheck.setText("Center Black Hole");
 		blackHoleCheck.setSelected(Main.centerBlackHole != null);
@@ -48,6 +50,8 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		//------------------------Velocityarrows-------------------------------
+		
 		JCheckBox showVelocityCheck = new JCheckBox();
 		showVelocityCheck.setText("Display Velocity");
 		showVelocityCheck.setSelected(Main.showVelocityArrows);
@@ -67,6 +71,8 @@ public class OptionWindow extends JFrame{
 				}
 			}
 		});
+		
+		//---------------------Quadtree----------------------------------
 		
 		JCheckBox quadTreeCheck = new JCheckBox();
 		quadTreeCheck.setText("Display Quadtree");
@@ -88,6 +94,8 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		//------------------------Collision-------------------------------
+		
 		JCheckBox collisionCheck = new JCheckBox();
 		collisionCheck.setText("Collisions");
 		collisionCheck.setSelected(Main.collisions);
@@ -107,6 +115,8 @@ public class OptionWindow extends JFrame{
 				}
 			}
 		});
+		
+		//----------------------Bounds---------------------------------
 		
 		JCheckBox boundsCheck = new JCheckBox();
 		boundsCheck.setText("Bounded");
@@ -129,13 +139,17 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		//------------------------Smoothing-------------------------------
+		
 		JLabel smoothingLabel = new JLabel();
 		smoothingLabel.setText("Smoothing:");
-		smoothingLabel.setBounds(0, 0+100, 100, 20);
+		
+		//We move the label to the right by 22 pixels because of layout purposes. That's the width of the checkbox.
+		smoothingLabel.setBounds(0+22, 0+100, 100, 20);
 		
 		JTextField smoothingField = new JTextField();
 		smoothingField.setText(String.valueOf(Main.smoothingParam));
-		smoothingField.setBounds(0+70, 0+100, 30, 20);
+		smoothingField.setBounds(150, 0+100, 40, 20);
 		smoothingField.addActionListener(new ActionListener()
 		{
 			@Override
@@ -151,13 +165,15 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		//------------------------Spread-------------------------------
+		
 		JLabel spreadLabel = new JLabel();
 		spreadLabel.setText("Radius of spread:");
-		spreadLabel.setBounds(0, 0+120, 100, 20);
+		spreadLabel.setBounds(0+22, 0+120, 100, 20);
 		
 		JTextField spreadField = new JTextField();
 		spreadField.setText(String.valueOf(Main.initalSpreadRadius));
-		spreadField.setBounds(0+105, 0+120, 40, 20);
+		spreadField.setBounds(150, 0+120, 40, 20);
 		spreadField.addActionListener(new ActionListener()
 		{
 			@Override
@@ -173,6 +189,8 @@ public class OptionWindow extends JFrame{
 				}
 			}
 		});
+		
+		//---------------------New Galaxy----------------------------------
 		
 		JCheckBox newgalaxyCheck = new JCheckBox();
 		newgalaxyCheck.setText("New Galaxy");
@@ -191,6 +209,8 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		//------------------------Editor-------------------------------
+		
 		JCheckBox editorCheck = new JCheckBox();
 		editorCheck.setText("Editor");
 		editorCheck.setFocusable(false);
@@ -208,6 +228,115 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
+		//----------------------Initial Orbit---------------------------------
+		
+		JCheckBox initOrbitCheck = new JCheckBox();
+		initOrbitCheck.setText("Initial Orbit");
+		initOrbitCheck.setSelected(Main.initOrbit);
+		initOrbitCheck.setFocusable(false);
+		initOrbitCheck.setBounds(0, 0+180, 100, 20);
+		initOrbitCheck.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(initOrbitCheck.isSelected()) {
+					Main.initOrbit = true;
+				}else {
+					Main.initOrbit = false;
+				}
+				
+			}
+		});
+		
+		//-------------------------Random Velocity------------------------------
+		
+		JCheckBox randomVelocityCheck = new JCheckBox();
+		randomVelocityCheck.setText("Random Velocity");
+		randomVelocityCheck.setSelected(Main.randomVelocity);
+		randomVelocityCheck.setFocusable(false);
+		randomVelocityCheck.setBounds(0, 0+200, 140, 20);
+		randomVelocityCheck.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(randomVelocityCheck.isSelected()) {
+					Main.randomVelocity = true;
+				}else {
+					Main.randomVelocity = false;
+				}
+				
+			}
+		});
+		
+		JLabel initVelLabel = new JLabel();
+		initVelLabel.setText("Max Initial Velocity:");
+		initVelLabel.setBounds(0 + 22, 0+220, 160, 20);
+		
+		JTextField initVelField = new JTextField();
+		
+		//Since velocity values are really small in the simulation, and we want to convey a certain sense of speed, scale up the real values, and scale them down after typing them into the field.
+		initVelField.setText(String.valueOf(Main.maxInitVel*100.0));
+		initVelField.setBounds(150, 0+220, 40, 20);
+		initVelField.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				try
+				{
+					Main.maxInitVel = Double.parseDouble(initVelField.getText())/100.0;
+				} catch(NumberFormatException e) {
+					System.out.println("Entry is not a double.");
+					smoothingField.setText("NaN");
+				}
+			}
+		});
+		
+		//------------------------Random Mass-------------------------------
+		
+		JCheckBox randomMass = new JCheckBox();
+		randomMass.setText("Random Mass");
+		randomMass.setSelected(Main.randomMass);
+		randomMass.setFocusable(false);
+		randomMass.setBounds(0, 0+240, 140, 20);
+		randomMass.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(randomMass.isSelected()) {
+					Main.randomMass = true;
+				}else {
+					Main.randomMass = false;
+				}
+			}
+		});
+		
+		JLabel massLabel = new JLabel();
+		massLabel.setText("Max Random Mass:");
+		massLabel.setBounds(0 + 22, 0+260, 160, 20);
+		
+		JTextField massField = new JTextField();
+		
+		//Since velocity values are really small in the simulation, and we want to convey a certain sense of speed, scale up the real values, and scale them down after typing them into the field.
+		massField.setText(String.valueOf(Main.maxRandomMass));
+		massField.setBounds(150, 0+260, 40, 20);
+		massField.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				try
+				{
+					Main.maxRandomMass = Double.parseDouble(massField.getText());
+				} catch(NumberFormatException e) {
+					System.out.println("Entry is not a double.");
+					smoothingField.setText("NaN");
+				}
+			}
+		});
+		
+		//-------------------------------------------------------
+		
 		add(blackHoleCheck);
 		add(showVelocityCheck);
 		add(quadTreeCheck);
@@ -219,5 +348,12 @@ public class OptionWindow extends JFrame{
 		add(spreadLabel);
 		add(spreadField);
 		add(editorCheck);
+		add(randomVelocityCheck);
+		add(initOrbitCheck);
+		add(initVelLabel);
+		add(initVelField);
+		add(randomMass);
+		add(massLabel);
+		add(massField);
 	}
 }

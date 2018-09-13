@@ -22,29 +22,9 @@ public class EditorWindow extends JFrame{
 		setLayout(null);
 		setVisible(false);
 		
-		JCheckBox dragCheck = new JCheckBox();
-		dragCheck.setText("Drag");
-		dragCheck.setSelected(EditorHandler.drag);
-		dragCheck.setBounds(0, 0, 130, 20);
-		dragCheck.setFocusable(false);
-		dragCheck.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if(dragCheck.isSelected())
-				{
-					EditorHandler.drag = true;
-				}else
-				{
-					EditorHandler.drag = false;
-				}
-			}
-		});
-		
 		JLabel massLabel = new JLabel();
 		massLabel.setText("Mass:");
-		massLabel.setBounds(0, 20, 100, 20);
+		massLabel.setBounds(0, 0, 100, 20);
 		
 		JTextField massField = new JTextField();
 		massField.setText(String.valueOf(EditorHandler.setMass));
@@ -64,9 +44,29 @@ public class EditorWindow extends JFrame{
 			}
 		});
 		
-		add(dragCheck);
+		JCheckBox velocityCheck = new JCheckBox();
+		velocityCheck.setText("Velocity");
+		velocityCheck.setSelected(EditorHandler.velocity);
+		velocityCheck.setBounds(70, 0, 130, 20);
+		velocityCheck.setFocusable(false);
+		velocityCheck.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				if(velocityCheck.isSelected())
+				{
+					EditorHandler.velocity = true;
+				}else
+				{
+					EditorHandler.velocity = false;
+				}
+			}
+		});
+		
 		add(massLabel);
 		add(massField);
+		add(velocityCheck);
 	}
 }
 
