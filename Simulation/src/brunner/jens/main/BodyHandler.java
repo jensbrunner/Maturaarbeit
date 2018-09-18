@@ -104,8 +104,7 @@ public class BodyHandler
 				Vector2 forceVector = Vector2Math.mult(Vector2Math.mult(distVec, 1/dist), Constants.GRAVITATIONAL_CONSTANT*planet.mass*otherPlanet.mass*(1/(dist*dist)));
 
 				if(dist < Main.smoothingParam) {
-					//forceVector = Constants.ZERO_VECTOR;
-					dist = Main.smoothingParam;
+					forceVector = Constants.ZERO_VECTOR;
 				}
 
 				planet.force = Vector2Math.add(planet.force, forceVector);

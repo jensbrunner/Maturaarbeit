@@ -27,6 +27,8 @@ public class MouseMotionListener implements java.awt.event.MouseMotionListener {
 				Main.boundingAcceptable = false;
 			}
 		}else if(EditorHandler.inEditor && !EditorHandler.velocity) {
+			
+			//Add new body
 			BodyHandler.planets.add(new Body(drawPos, Constants.ZERO_VECTOR, EditorHandler.setMass));
 			SimulationWindow.updateBodyLabel(Main.curBodyAmount + 1);
 		}

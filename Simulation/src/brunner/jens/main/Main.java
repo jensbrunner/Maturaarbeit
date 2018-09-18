@@ -9,18 +9,18 @@ import brunner.jens.utils.Vector2;
 public class Main
 {
 
-	//Booleans that control much of sim functionality, alongside some values pertaining to those functionalities.
+	//Booleans that control much of simulation functionality, alongside some values pertaining to those functionalities.
 	public static boolean close = false, reset = false, showVelocityArrows = false, collisions = false, quadTree = false, creatingGalaxy = false, 
-						  barneshut = true, frameTest = false, pause = false, randomVelocity = true, initOrbit, randomMass = false;
+						  barneshut = true, frameTest = false, pause = false, randomVelocity = false, initOrbit = true, randomMass = false;
 	public static int iterations, lastIterations, initPlanetAmount = 2000, curBodyAmount = 0, blackHoleMass = 10000 ;
-	public static double scaleFactor = 1, timeScale = 1, timeCounter = 0, maxInitVel = 0.1, maxRandomMass = 10;
-	public static int initalSpreadRadius = 1000;
+	public static double scaleFactor = 0.3, timeScale = 1, timeCounter = 0, maxInitVel = 0.1, maxRandomMass = 10;
+	public static int initalSpreadRadius = 1500;
 	public static  double smoothingParam = 5;
 	public static boolean bounded, isBounding, boundingAcceptable;
 	public static Vector2 boundVec, boundVec2;
 	
 	//This is controlled by the "blackHoleCheck" CheckBox in the GUI (see SimulationWindow.java)
-	public static Body centerBlackHole = null;
+	public static Body centerBlackHole = new Body(Constants.SCREEN_CENTER, Constants.ZERO_VECTOR, blackHoleMass);
 	
 	//Timestamp variables necessary to keep track of elapsed time for the gameloop and other features.
 	static long startTime = System.currentTimeMillis();
@@ -31,7 +31,7 @@ public class Main
 		SimulationWindow.simWind = new SimulationWindow();
 		EditorHandler.editorWindow = new EditorWindow();
 		
-		//We call this function to set everything up for the beginning.
+		//This function is called to set everything up for the beginning.
 		Main.reset();
 		
 		//We have to initialise the variable outside of the loop.
@@ -47,7 +47,7 @@ public class Main
 			SimulationWindow.timePassed.setText(Toolbox.approxRound(timeCounter, 3) + " sec");
 			currentTime = newTime;
 			
-			//Every second, update the FPS counter
+			//Every second (depends on frametime), update the FPS counter
 			if(currentTime - lastFPSTime > 1000)
 			{
 				showFPS(currentTime - lastFPSTime);
@@ -55,9 +55,8 @@ public class Main
 				lastFPSTime = currentTime;
 			}
 
-			//System.out.println(Toolbox.getTotalEnergy());
 			
-			//if(frameTest) Main.debug(currentTime);
+			if(frameTest) Main.debug(currentTime);
 			
 			if(reset) Main.reset();
 				
@@ -72,6 +71,7 @@ public class Main
 		}
 		System.exit(0);
 	}
+	
 	
 	private static void reset() {
 		BodyHandler.planets.clear();
@@ -94,6 +94,7 @@ public class Main
 		reset = false;
 	}
 	
+	//This function was used to analyse performance.
 	private static void debug(long currentTime) {
 		if(currentTime - startTime > 5000) {
 			System.out.println("Modus: " + Main.barneshut);

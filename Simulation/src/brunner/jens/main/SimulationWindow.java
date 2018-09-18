@@ -53,6 +53,8 @@ public class SimulationWindow extends JFrame
 		//Init optionWindow in here as it is "part" of the SimulationWindow and should thus be controlled by it.
 		optionWindow = new OptionWindow();
 
+		//------------------Close--------------
+		
 		JButton closeButton = new JButton();
 		closeButton.setBounds(1920-70, 0, 70, 20);
 		closeButton.setText("Close");
@@ -66,6 +68,8 @@ public class SimulationWindow extends JFrame
 				Main.close = true;
 			}
 		});
+		
+		//----------------Intial body amount---------------------
 		
 		JTextField bodyAmount = new JTextField();
 		bodyAmount.setText(String.valueOf(Main.initPlanetAmount));
@@ -88,6 +92,8 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
+		//----------------Reset---------------------
+		
 		JButton resetButton = new JButton();
 		resetButton.setBounds(1920-70-70, 0, 70, 20);
 		resetButton.setText("Reset");
@@ -102,6 +108,8 @@ public class SimulationWindow extends JFrame
 				Main.reset = true;
 			}
 		});
+		
+		//------------------Orbit-------------------
 		
 		JButton orbitButton = new JButton();
 		orbitButton.setBounds(1920-70-70-70, 0, 70, 20);
@@ -127,6 +135,8 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
+		//----------------Advanced Options---------------------
+		
 		JButton optionsButton = new JButton();
 		optionsButton.setBounds(1920-138, 1080-20, 138, 20);
 		optionsButton.setText("Advanced Options");
@@ -141,6 +151,7 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
+		//--------------------Zoom-----------------
 		
 		zoom = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 100, 10000, true);
 		zoomLabel.setText("Zoom: " + String.valueOf(Main.scaleFactor) + "x");
@@ -178,6 +189,8 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
+		//------------------Time speed-------------------
+		
 		time = new FloatSlider(Scrollbar.HORIZONTAL, 1, 0, 0.0001, 1000, 10000, true);
 		timeLabel.setText("Time: " + String.valueOf(Main.timeScale) + "x");
 		timeLabel.setBounds(Constants.WINDOW_DIMENSION.width/2+260, 1080-40-10, 200, 10);
@@ -213,21 +226,29 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		
+		//-----------------Time Counter--------------------
+		
 		timePassed.setText(Main.timeCounter + " sec");
 		timePassed.setForeground(Color.WHITE);
 		timePassed.setFocusable(false);
 		timePassed.setBounds(10, 0, 100, 50);
+		
+		//------------------FPS counter-------------------
 		
 		fpsCounter.setText("");
 		fpsCounter.setForeground(Color.WHITE);
 		fpsCounter.setFocusable(false);
 		fpsCounter.setBounds(10+100, 0, 100, 50);
 		
+		//------------------Bodycount-------------------
+		
 		curBodyLabel.setText("Bodies: ");
 		curBodyLabel.setForeground(Color.WHITE);
 		curBodyLabel.setFocusable(false);
 		curBodyLabel.setBounds(10+200, 0, 100, 50);
 
+		//-------------------------------------
+		
 		add(closeButton);
 		add(resetButton);
 		add(orbitButton);
@@ -259,6 +280,7 @@ public class SimulationWindow extends JFrame
 		
 	}
 	
+	//Function to easily update the body label.
 	public static void updateBodyLabel(int amount) {
 		Main.curBodyAmount = amount;
 		curBodyLabel.setText("" + amount);

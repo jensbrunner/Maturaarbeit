@@ -28,15 +28,13 @@ public class Vector2Math
 		return new Vector2(vec1.x + vec2.x, vec1.y + vec2.y);
 	}
 	
+	//Multiply a vector by a scalar
 	public static Vector2 mult(Vector2 vec1, double factor)
 	{
 		return new Vector2(vec1.x * factor, vec1.y * factor);
 	}
 	
-	public static Vector2 scale(Vector2 vec, double oldMag,double scalar)
-	{
-		//double oldMag = Vector2Math.magnitude(vec);
-		double newMag = oldMag * scalar;
-		return new Vector2((vec.x/oldMag)*newMag, (vec.y/oldMag)*newMag);
-	}
+	
+	/*public static Vector2 scale(Vector2 vec, double scalar) This function is never used in the code*/
+
 }

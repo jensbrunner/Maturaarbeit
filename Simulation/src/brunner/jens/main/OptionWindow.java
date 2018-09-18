@@ -84,7 +84,7 @@ public class OptionWindow extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				if(quadTreeCheck.isSelected())
+				if(quadTreeCheck.isSelected() && Main.barneshut)
 				{
 					Main.quadTree = true;
 				}else
@@ -335,7 +335,29 @@ public class OptionWindow extends JFrame{
 			}
 		});
 		
-		//-------------------------------------------------------
+		//------------------------Simulation Algorithm-------------------------------
+		
+		JCheckBox barnesCheck = new JCheckBox();
+		barnesCheck.setText("Barnes-Hut");
+		barnesCheck.setSelected(Main.barneshut);
+		barnesCheck.setFocusable(false);
+		barnesCheck.setBounds(0, 0+280, 100, 20);
+		barnesCheck.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(barnesCheck.isSelected()) {
+					Main.barneshut = true;
+				}else {
+					Main.barneshut = false;
+					quadTreeCheck.setSelected(false);
+					Main.quadTree = false;
+				}
+				
+			}
+		});
+		
+		//----------------------------------------
 		
 		add(blackHoleCheck);
 		add(showVelocityCheck);
@@ -355,5 +377,6 @@ public class OptionWindow extends JFrame{
 		add(randomMass);
 		add(massLabel);
 		add(massField);
+		add(barnesCheck);
 	}
 }

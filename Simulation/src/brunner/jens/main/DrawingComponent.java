@@ -67,7 +67,8 @@ public class DrawingComponent extends JComponent
 	public static void paintBody(Vector2 position, Vector2 vel)
 	{
 		g2.setColor(Color.WHITE);
-		//Based on the zoom level, scale the bodies accordingly.
+		
+		//Based on the zoom level, scale the body sizes accordingly.
 		double radius = Main.scaleFactor*4/2;
 		if(radius < 1) radius = 1;
 		g2.fill(new Ellipse2D.Double(position.x-radius, position.y-radius, radius*2, radius*2));

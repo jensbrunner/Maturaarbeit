@@ -15,7 +15,7 @@ public class EditorWindow extends JFrame{
 		super("Editor Options");
 		setUndecorated(true);
 		setSize(200, 20);
-		setLocation(1920/2-200, 0);
+		setLocation(1920/2-100, 0);
 		setResizable(false);
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);

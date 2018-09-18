@@ -34,8 +34,8 @@ public class MouseListener implements java.awt.event.MouseListener {
 		
 		SimulationWindow.resetFocus();
 		
+		//Since we go from screen to simulationspace, we want to translate in the opposite direction. (therefore the last parameter boolean is "true")
 		Vector2 drawPos = Toolbox.translateToScreen(new Vector2(e.getX(),e.getY()), true);
-		//Vector2 drawPosInverse = Toolbox.translateToScreen(new Vector2(e.getX(),e.getY()), true);
 		
 		if(Main.creatingGalaxy && !(Main.isBounding || EditorHandler.inEditor)) {
 			Toolbox.createGalaxy(drawPos, 300, 400);
@@ -46,7 +46,7 @@ public class MouseListener implements java.awt.event.MouseListener {
 		}else if(EditorHandler.inEditor) {
 			if(EditorHandler.drawingVelocity) {
 				Vector2 diff = Vector2Math.subtract(drawPos, EditorHandler.createdBody.position);
-				EditorHandler.createdBody.vel = Vector2Math.scale(diff, Vector2Math.magnitude(diff), 0.001/**(1/Main.scaleFactor)*/);
+				EditorHandler.createdBody.vel = Vector2Math.mult(diff, 0.001);
 				EditorHandler.drawingVelocity = false;
 				EditorHandler.createdBody = null;
 			}else {
